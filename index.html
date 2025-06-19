@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vorta Fitness - Club Management</title>
+    
+    <!-- External Libraries (Bootstrap & Font Awesome) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts (Poppins & Tahoma for Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tahoma:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- INTERNAL CSS -->
+    <style>
+        :root {
+            --dark-bg: #1a1c23;
+            --dark-surface: #252831;
+            --primary-color: #0d6efd;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --text-light: #f8f9fa;
+            --text-muted: #8a92a6;
+            --border-color: #3b3e47;
+            --body-font: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            margin: 0;
+            font-size: 0.9rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- LOGIN STYLES START --- */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--dark-surface);
+            padding: 2.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .login-box .form-control {
+            padding: 0.75rem 1rem;
+            height: 50px;
+        }
+        .login-box .btn {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+        .login-header {
+             display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .login-header .fa-dumbbell { color: var(--primary-color); }
+        .login-header h1 { letter-spacing: 0.5px; font-weight: 600; font-size: 1.5rem; }
+        #login-error-msg {
+            display: none;
+            font-size: 0.85rem;
+        }
+        /* --- LOGIN STYLES END --- */
+
+
+        .main-container { display: flex; min-height: 100vh; }
+        .main-container.d-none { display: none !important; } /* To hide the main app before login */
+
+        .content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+
+        .main-sidebar {
+            width: 260px;
+            background-color: var(--dark-surface);
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-header .fa-dumbbell { color: var(--primary-color); }
+        .sidebar-header h1 { letter-spacing: 0.5px; font-weight: 600; }
+
+        .main-sidebar .list-group-item {
+            background: transparent; color: var(--text-muted); border: none; padding: 1.1rem 1.5rem;
+            font-weight: 500; transition: all 0.2s ease-in-out; border-left: 4px solid transparent;
+        }
+        .main-sidebar .list-group-item:hover { background-color: var(--dark-bg); color: var(--text-light); }
+        .main-sidebar .list-group-item.active { background-color: var(--dark-bg); color: var(--text-light); border-left-color: var(--primary-color); font-weight: 600; }
+        
+        .navbar { background-color: var(--dark-surface); border-bottom: 1px solid var(--border-color); padding: 0.75rem 1rem; }
+        main.container-fluid { padding: 2rem; }
+        
+        h2.mb-4 { font-weight: 600; color: #e9ecef; }
+        h5.card-title { font-weight: 600; }
+        p.text-muted { font-size: 0.85rem; }
+
+        .btn { font-weight: 500; }
+        .btn-group-lang .btn { color: var(--text-muted); border-color: var(--border-color); }
+        .btn-group-lang .btn.active, .btn-group-lang .btn:hover { background-color: var(--primary-color); color: var(--text-light); border-color: var(--primary-color); }
+
+        .card { background-color: var(--dark-surface); border: 1px solid var(--border-color); border-radius: 0.5rem; }
+        .stat-card { background-color: var(--dark-surface); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem; border: 1px solid var(--border-color); }
+        .stat-card .card-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #fff; flex-shrink: 0;}
+        .stat-card .card-title { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.1rem; }
+        .stat-card .card-value { font-size: 1.8rem; font-weight: 600; color: var(--text-light); margin: 0; line-height: 1.2; }
+        
+        .clickable-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .clickable-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .chart-container { background-color: var(--dark-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); }
+        .table { background-color: transparent; color: var(--text-light); }
+        .table thead th { color: var(--text-muted); border-bottom: 2px solid var(--border-color); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; padding-top: 1rem; padding-bottom: 1rem;}
+        .table td, .table th { border-bottom: 1px solid var(--border-color); vertical-align: middle; padding: 0.9rem 0.75rem; }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table-hover tbody tr:hover { background-color: var(--dark-bg); }
+
+        .modal-content { background-color: var(--dark-surface); color: var(--text-light); border: 1px solid var(--border-color); border-radius: 0.5rem;}
+        .modal-header, .modal-footer { border-color: var(--border-color); }
+        .modal-header { padding: 1rem 1.5rem; } .modal-body { padding: 1.5rem; } .modal-footer { padding: 1rem 1.5rem; }
+        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+        .form-label { margin-bottom: 0.5rem; font-weight: 500; color: var(--text-muted); font-size: 0.85rem;}
+        .form-control, .form-select { background-color: var(--dark-bg); color: var(--text-light); border: 1px solid var(--border-color); padding: 0.6rem 1rem; }
+        .form-control:focus, .form-select:focus { background-color: var(--dark-bg); color: var(--text-light); border-color: var(--primary-color); box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+        .form-control:read-only { background-color: #313541; }
+        .input-group-text { background-color: var(--dark-bg); border-color: var(--border-color); color: var(--text-muted); }
+        .dropdown-menu { background-color: var(--dark-surface); border-color: var(--border-color); }
+        .dropdown-item { color: var(--text-light); } .dropdown-item:hover { background-color: var(--primary-color); }
+        
+        /* NEW: Loading spinner */
+        .spinner-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); display: flex;
+            align-items: center; justify-content: center; z-index: 9999;
+            flex-direction: column; gap: 1rem; color: var(--text-light);
+        }
+
+        [dir="rtl"] { font-family: 'Tahoma', sans-serif; }
+        [dir="rtl"] .main-sidebar { border-right: none; border-left: 1px solid var(--border-color); }
+        [dir="rtl"] .main-sidebar .list-group-item.active { border-left: none; border-right: 4px solid var(--primary-color); }
+        [dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: .5rem !important; }
+        [dir="rtl"] .me-3 { margin-right: 0 !important; margin-left: 1rem !important; }
+        [dir="rtl"] .ms-auto { margin-right: auto !important; margin-left: 0 !important; }
+        [dir="rtl"] .text-end { text-align: left !important; }
+        [dir="rtl"] .text-start { text-align: right !important; }
+    </style>
+</head>
+<body>
+    <!-- NEW: Loading Spinner -->
+    <div id="loading-spinner" class="spinner-overlay d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p id="loading-text">Loading...</p>
+    </div>
+
+    <!-- ======================= LOGIN SCREEN ======================= -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-dumbbell fa-2x me-3"></i>
+                <h1 class="h3 mb-0">Vorta Fitness</h1>
+            </div>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="password" class="form-label" data-translate="password">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <div class="alert alert-danger" id="login-error-msg" data-translate="alertIncorrectPassword">
+                    Incorrect password.
+                </div>
+                <button type="submit" class="btn btn-primary w-100" data-translate="login">Login</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ======================= MAIN APP CONTAINER (hidden by default) ======================= -->
+    <div class="main-container d-none">
+        <!-- ======================= SIDEBAR ======================= -->
+        <aside class="main-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-dumbbell fa-lg me-2"></i>
+                <h1 class="h5 mb-0">Vorta Fitness</h1>
+            </div>
+            <ul class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action active" data-tab="dashboard"><i class="fas fa-chart-pie fa-fw me-3"></i><span data-translate="dashboard">Dashboard</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="members"><i class="fas fa-users fa-fw me-3"></i><span data-translate="members">Members</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="financials"><i class="fas fa-wallet fa-fw me-3"></i><span data-translate="financials">Financials</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="subscriptions"><i class="fas fa-tags fa-fw me-3"></i><span data-translate="subscriptions">Subscriptions</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="messaging"><i class="fas fa-comments fa-fw me-3"></i><span data-translate="messaging">Messaging</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="reports"><i class="fas fa-chart-line fa-fw me-3"></i><span data-translate="reports">Reports</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="settings"><i class="fas fa-cog fa-fw me-3"></i><span data-translate="settings">Settings</span></a>
+            </ul>
+        </aside>
+
+        <!-- ======================= CONTENT WRAPPER ======================= -->
+        <div class="content-wrapper">
+            <nav class="navbar"><div class="container-fluid"><div class="ms-auto btn-group btn-group-sm btn-group-lang"><button type="button" class="btn btn-outline-secondary" data-lang="english">English</button><button type="button" class="btn btn-outline-secondary" data-lang="arabic">العربية</button></div></div></nav>
+            <main class="container-fluid">
+                <!-- DASHBOARD TAB -->
+                <div id="dashboard-tab" class="content-tab">
+                    <h2 class="mb-4" data-translate="dashboard">Dashboard</h2>
+                    <!-- Member Stats -->
+                    <div class="row g-4">
+                        <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="all"><div class="card-icon bg-primary"><i class="fas fa-users"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalMembers">Total Members</h6><p class="card-value" id="total-members">0</p></div></div></div>
+                        <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="active"><div class="card-icon bg-success"><i class="fas fa-check-circle"></i></div><div class="card-details"><h6 class="card-title" data-translate="activeSubscriptions">Active Subscriptions</h6><p class="card-value" id="active-subscriptions">0</p></div></div></div>
+                        <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="expiring"><div class="card-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></div><div class="card-details"><h6 class="card-title" data-translate="expiringSoon">Expiring Soon</h6><p class="card-value" id="expiring-subscriptions">0</p></div></div></div>
+                        <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="unsubscribed"><div class="card-icon bg-danger"><i class="fas fa-times-circle"></i></div><div class="card-details"><h6 class="card-title" data-translate="unsubscribed">Unsubscribed</h6><p class="card-value" id="unsubscribed-members">0</p></div></div></div>
+                    </div>
+                     <!-- Financial Stats -->
+                    <h3 class="my-4" data-translate="financialSummary">Financial Summary</h3>
+                    <div class="row g-4">
+                        <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--success-color);"><i class="fas fa-arrow-up"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalIncome">Total Income</h6><p class="card-value" id="total-income">₪0</p></div></div></div>
+                        <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--danger-color);"><i class="fas fa-arrow-down"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalExpenses">Total Expenses</h6><p class="card-value" id="total-expenses">₪0</p></div></div></div>
+                        <div class="col-xl-4 col-md-12"><div class="stat-card"><div class="card-icon" style="background-color: var(--primary-color);"><i class="fas fa-balance-scale"></i></div><div class="card-details"><h6 class="card-title" data-translate="netProfit">Net Profit</h6><p class="card-value" id="net-profit">₪0</p></div></div></div>
+                    </div>
+                    <!-- Charts -->
+                    <div class="row g-4 mt-4">
+                        <div class="col-lg-7"><div class="chart-container"><canvas id="subscriptionTypeChart"></canvas></div></div>
+                        <div class="col-lg-5"><div class="chart-container"><canvas id="genderDistributionChart"></canvas></div></div>
+                    </div>
+                </div>
+                <!-- MEMBERS TAB -->
+                <div id="members-tab" class="content-tab d-none"><div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3"><h2 class="mb-0" data-translate="members">Members</h2><div class="d-flex align-items-center gap-2"><div class="input-group"><span class="input-group-text"><i class="fas fa-search"></i></span><input type="search" id="member-search" class="form-control" placeholder="Search..." data-translate="search"></div><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal"><i class="fas fa-plus me-2"></i><span data-translate="addMember">Add Member</span></button></div></div><div class="btn-group btn-group-sm mb-3" role="group"><button type="button" class="btn btn-outline-secondary active" onclick="filterMembersByGender('all')" data-gender="all" data-translate="all">All</button><button type="button" class="btn btn-outline-secondary" onclick="filterMembersByGender('male')" data-gender="male" data-translate="male">Male</button><button type="button" class="btn btn-outline-secondary" onclick="filterMembersByGender('female')" data-gender="female" data-translate="female">Female</button></div><div class="table-responsive"><table class="table table-hover" id="members-table"><thead><tr><th data-translate="memberId">ID</th><th data-translate="fullName">Full Name</th><th data-translate="gender">Gender</th><th data-translate="contact">Contact</th><th data-translate="subscription">Subscription</th><th data-translate="status">Status</th><th data-translate="actions">Actions</th></tr></thead><tbody></tbody></table></div></div>
+                
+                <!-- FINANCIALS TAB -->
+                <div id="financials-tab" class="content-tab d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <h2 class="mb-0" data-translate="financials">Financials</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal" onclick="prepareAddTransactionModal()"><i class="fas fa-plus me-2"></i><span data-translate="addTransaction">Add Transaction</span></button>
+                    </div>
+                    <div class="card bg-surface">
+                        <div class="card-body">
+                           <div class="table-responsive">
+                               <table class="table table-hover" id="financials-table">
+                                   <thead><tr>
+                                       <th data-translate="date">Date</th>
+                                       <th data-translate="description">Description</th>
+                                       <th data-translate="type">Type</th>
+                                       <th class="text-end" data-translate="amount">Amount</th>
+                                       <th class="text-end" data-translate="actions">Actions</th>
+                                   </tr></thead>
+                                   <tbody></tbody>
+                               </table>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBSCRIPTIONS TAB -->
+                <div id="subscriptions-tab" class="content-tab d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <h2 class="mb-0" data-translate="subscriptionManagement">Subscription Management</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#subscriptionTypeModal" onclick="prepareSubscriptionTypeModal(null)"><i class="fas fa-plus me-2"></i><span data-translate="addSubType">Add Subscription Type</span></button>
+                    </div>
+                    <div class="card bg-surface">
+                        <div class="card-body">
+                           <div class="table-responsive">
+                               <table class="table table-hover" id="subscription-types-table">
+                                   <thead><tr>
+                                       <th data-translate="subName">Name</th>
+                                       <th data-translate="durationInDays">Duration (Days)</th>
+                                       <th data-translate="price">Price</th>
+                                       <th data-translate="actions">Actions</th>
+                                   </tr></thead>
+                                   <tbody></tbody>
+                               </table>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MESSAGING TAB -->
+                <div id="messaging-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="messaging">Messaging</h2><div class="row g-4"><div class="col-lg-5"><div class="card bg-surface h-100"><div class="card-body d-flex flex-column"><h5 class="card-title mb-4" data-translate="sendNewMessage">Send New Message</h5><form id="message-form"><div class="mb-3"><label for="message-recipients" class="form-label" data-translate="recipients">Recipients</label><select id="message-recipients" class="form-select" data-translate-options="recipientsOptions"></select></div><div class="mb-3 d-none" id="individual-select-container"><label for="individual-member" class="form-label" data-translate="selectMember">Select Member</label><select id="individual-member" class="form-select"></select></div><div class="mb-3"><label for="message-content" class="form-label" data-translate="message">Message</label><textarea id="message-content" class="form-control" rows="6" placeholder="Type your message..." data-translate="messagePlaceholder"></textarea></div><button type="submit" class="btn btn-primary w-100 mt-auto"><i class="fas fa-paper-plane me-2"></i><span data-translate="sendMessage">Send Message</span></button></form></div></div></div><div class="col-lg-7"><div class="card bg-surface h-100"><div class="card-body"><h5 class="card-title mb-4" data-translate="messageHistory">Message History</h5><div class="table-responsive" style="max-height: 500px;"><table class="table" id="message-history-table"><thead data-translate-headers="messageHistoryHeaders"><tr><th>Date</th><th>Recipients</th><th>Message</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div></div></div></div>
+                <!-- REPORTS TAB -->
+                <div id="reports-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="advancedReports">Advanced Reports</h2><div class="row g-4"><div class="col-12"><div class="card bg-surface"><div class="card-body"><h5 class="card-title" data-translate="memberGrowth">Member Growth</h5><p class="text-muted small" data-translate="memberGrowthDesc">Shows members joined each month.</p><div class="chart-container" style="height: 350px;"><canvas id="memberGrowthChart"></canvas></div></div></div></div><div class="col-12"><div class="card bg-surface"><div class="card-body"><h5 class="card-title" data-translate="subscriptionsReport">Subscriptions Report</h5><p class="text-muted small" data-translate="subscriptionsReportDesc">Detailed subscription data.</p><div class="table-responsive"><table class="table" id="subscriptions-report-table"><thead data-translate-headers="subscriptionsReportHeaders"><tr><th>Member Name</th><th>Sub. Type</th><th>Start Date</th><th>End Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div></div></div></div>
+                <!-- SETTINGS TAB -->
+                <div id="settings-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="settings">Settings</h2><div class="row g-4"><div class="col-md-6"><div class="card bg-surface h-100"><div class="card-body"><h5 class="card-title" data-translate="changePassword">Change Password</h5><p class="text-muted small" data-translate="changePasswordDesc">Update the system access password.</p><form id="change-password-form"><div class="mb-3"><label for="current-password" class="form-label" data-translate="currentPassword">Current Password</label><input type="password" id="current-password" class="form-control" required></div><div class="mb-3"><label for="new-password" class="form-label" data-translate="newPassword">New Password</label><input type="password" id="new-password" class="form-control" required></div><div class="mb-3"><label for="confirm-password" class="form-label" data-translate="confirmPassword">Confirm New Password</label><input type="password" id="confirm-password" class="form-control" required></div><button type="submit" class="btn btn-primary" data-translate="saveChanges">Save Changes</button></form></div></div></div><div class="col-md-6"><div class="card bg-surface h-100"><div class="card-body d-flex flex-column"><h5 class="card-title" data-translate="dataManagement">Data Management</h5><p class="text-muted small" data-translate="dataManagementDesc">Application-level actions.</p><div class="mt-auto"><button class="btn btn-danger" onclick="alert('This feature is disabled when connected to Google Sheets.')"><i class="fas fa-undo me-2"></i><span data-translate="resetData">Reset All Data</span></button><p class="mt-2 small text-danger">This feature is not recommended when using a live database.</p></div></div></div></div></div></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="addMemberTitle">Add New Member</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="add-member-form" novalidate><div class="row g-3"><div class="col-md-6"><label for="add-first-name" class="form-label" data-translate="firstName">First Name</label><input type="text" class="form-control" id="add-first-name" required></div><div class="col-md-6"><label for="add-last-name" class="form-label" data-translate="lastName">Last Name</label><input type="text" class="form-control" id="add-last-name" required></div><div class="col-md-6"><label for="add-phone" class="form-label" data-translate="phone">Phone</label><input type="tel" class="form-control" id="add-phone" required></div><div class="col-md-6"><label for="add-email" class="form-label" data-translate="emailOptional">Email (Optional)</label><input type="email" class="form-control" id="add-email"></div><div class="col-md-6"><label for="add-gender" class="form-label" data-translate="gender">Gender</label><select id="add-gender" class="form-select" data-translate-options="genderOptions"></select></div><div class="col-md-6"><label for="add-language" class="form-label" data-translate="prefLanguage">Preferred Language</label><select id="add-language" class="form-select" data-translate-options="languageOptions"></select></div><hr class="my-3"><div class="col-md-6"><label for="add-member-subscription-type" class="form-label" data-translate="subscription">Subscription</label><select id="add-member-subscription-type" class="form-select"></select></div><div class="col-md-6"><label for="add-member-subscription-price" class="form-label" data-translate="price">Price</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="add-member-subscription-price" readonly></div></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="add-member-form" class="btn btn-primary" data-translate="addMember">Add Member</button></div></div></div></div>
+    <div class="modal fade" id="editMemberModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="editMemberTitle">Edit Member</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="edit-member-form"><input type="hidden" id="edit-member-id"><div class="row g-3"><div class="col-md-6"><label class="form-label" data-translate="firstName">First Name</label><input type="text" class="form-control" id="edit-first-name" required></div><div class="col-md-6"><label class="form-label" data-translate="lastName">Last Name</label><input type="text" class="form-control" id="edit-last-name" required></div><div class="col-md-6"><label class="form-label" data-translate="phone">Phone</label><input type="tel" class="form-control" id="edit-phone" required></div><div class="col-md-6"><label class="form-label" data-translate="email">Email</label><input type="email" class="form-control" id="edit-email"></div><div class="col-md-6"><label class="form-label" data-translate="gender">Gender</label><select id="edit-gender" class="form-select" data-translate-options="genderOptions"></select></div><div class="col-md-6"><label class="form-label" data-translate="prefLanguage">Preferred Language</label><select id="edit-language" class="form-select" data-translate-options="languageOptions"></select></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="edit-member-form" class="btn btn-primary" data-translate="saveChanges">Save Changes</button></div></div></div></div>
+    <div class="modal fade" id="viewMemberModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="memberDetailsTitle">Member Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="viewMemberModalBody"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="close">Close</button></div></div></div></div>
+    <div class="modal fade" id="subscriptionModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="subscriptionModalLabel" data-translate="addRenewSubTitle">Add/Renew Subscription</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="subscription-form"><input type="hidden" id="subscription-member-id"><p><span data-translate="member">Member</span>: <strong id="subscription-member-name"></strong></p><div class="mb-3"><label for="subscription-modal-type" class="form-label" data-translate="subType">Type</label><select id="subscription-modal-type" class="form-select"></select></div><div class="mb-3"><label for="subscription-start-date" class="form-label" data-translate="startDate">Start Date</label><input type="date" class="form-control" id="subscription-start-date" required></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="subscription-form" class="btn btn-primary" data-translate="save">Save</button></div></div></div></div>
+    <div class="modal fade" id="subscriptionTypeModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="subscriptionTypeModalLabel" data-translate="addSubType">Add Subscription Type</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="subscription-type-form"><input type="hidden" id="sub-type-id"><div class="mb-3"><label for="sub-type-name-en" class="form-label">Name (English)</label><input type="text" class="form-control" id="sub-type-name-en" required></div><div class="mb-3"><label for="sub-type-name-ar" class="form-label">Name (Arabic)</label><input type="text" class="form-control" id="sub-type-name-ar" dir="rtl" required></div><div class="mb-3"><label for="sub-type-duration" class="form-label" data-translate="durationInDays">Duration (Days)</label><input type="number" class="form-control" id="sub-type-duration" required min="1"></div><div class="mb-3"><label for="sub-type-price" class="form-label" data-translate="price">Price</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="sub-type-price" required min="0"></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="subscription-type-form" class="btn btn-primary" data-translate="save">Save</button></div></div></div></div>
+    <div class="modal fade" id="addTransactionModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="transactionModalLabel" data-translate="addTransaction">Add Transaction</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="add-transaction-form"><input type="hidden" id="transaction-id"><div class="mb-3"><label for="transaction-type" class="form-label" data-translate="type">Type</label><select id="transaction-type" class="form-select" data-translate-options="transactionTypeOptions"></select></div><div class="mb-3"><label for="transaction-description" class="form-label" data-translate="description">Description</label><input type="text" class="form-control" id="transaction-description" required></div><div class="mb-3"><label for="transaction-amount" class="form-label" data-translate="amount">Amount</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="transaction-amount" required min="0" step="0.01"></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="add-transaction-form" class="btn btn-primary" data-translate="save">Save</button></div></div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    // =================================================================================
+    // Vorta Fitness - Club Management System
+    // Version: 9.1 (Bootstrap Modal Instance Fix)
+    // =================================================================================
+    'use strict';
+    
+    // --- NEW: API Configuration ---
+    const API_URL = 'https://sheetdb.io/api/v1/5ua8j6rin3svf';
+    const SHEETS = {
+        members: 'Members',
+        transactions: 'Transactions',
+        subTypes: 'SubscriptionTypes',
+        msgHistory: 'MessageHistory',
+        passwords: 'Passwords'
+    };
+
+    const EXPIRATION_REMINDER_DAYS = 10;
+    
+    let currentTab = 'dashboard', currentLanguage = localStorage.getItem('vortaFitnessLanguage') || 'english';
+    let members = [], messageHistory = [], subscriptionTypes = [], transactions = [], passwords = []; 
+    let genderChart, subscriptionChart, memberGrowthChart = null;
+    let dashboardFilter = null; 
+
+    // --- TRANSLATIONS (Unchanged) ---
+    const translations = {
+        dashboard: { english: 'Dashboard', arabic: 'لوحة التحكم' }, members: { english: 'Members', arabic: 'الأعضاء' }, financials: { english: 'Financials', arabic: 'المالية' }, subscriptions: { english: 'Subscriptions', arabic: 'الاشتراكات' }, messaging: { english: 'Messaging', arabic: 'الرسائل' }, reports: { english: 'Reports', arabic: 'التقارير' }, settings: { english: 'Settings', arabic: 'الإعدادات' },
+        totalMembers: { english: 'Total Members', arabic: 'إجمالي الأعضاء' }, activeSubscriptions: { english: 'Active Subscriptions', arabic: 'الاشتراكات النشطة' }, expiringSoon: { english: 'Expiring Soon', arabic: 'تنتهي قريباً' }, unsubscribed: { english: 'Unsubscribed', arabic: 'غير مشتركين' },
+        financialSummary: { english: 'Financial Summary', arabic: 'الملخص المالي' }, totalIncome: { english: 'Total Income', arabic: 'إجمالي الإيرادات' }, totalExpenses: { english: 'Total Expenses', arabic: 'إجمالي المصروفات' }, netProfit: { english: 'Net Profit', arabic: 'صافي الربح' },
+        memberId: { english: 'ID', arabic: 'الرقم' }, fullName: { english: 'Full Name', arabic: 'الاسم الكامل' }, gender: { english: 'Gender', arabic: 'الجنس' }, contact: { english: 'Contact', arabic: 'التواصل' }, subscription: { english: 'Subscription', arabic: 'الاشتراك' }, status: { english: 'Status', arabic: 'الحالة' }, actions: { english: 'Actions', arabic: 'الإجراءات' },
+        addMember: { english: 'Add Member', arabic: 'إضافة عضو' }, search: { english: 'Search...', arabic: 'بحث...' }, all: { english: 'All', arabic: 'الكل' }, male: { english: 'Male', arabic: 'ذكور' }, female: { english: 'Female', arabic: 'إناث' },
+        save: { english: 'Save', arabic: 'حفظ' }, saveData: { english: 'Save Data', arabic: 'حفظ البيانات' }, saveChanges: { english: 'Save Changes', arabic: 'حفظ التغييرات' }, cancel: { english: 'Cancel', arabic: 'إلغاء' }, close: { english: 'Close', arabic: 'إغلاق' }, view: { english: 'View', arabic: 'عرض' }, edit: { english: 'Edit', arabic: 'تعديل' }, delete: { english: 'Delete', arabic: 'حذف' }, renewSub: { english: 'Renew Sub', arabic: 'تجديد اشتراك' },
+        sendNewMessage: { english: 'Send New Message', arabic: 'إرسال رسالة جديدة' }, recipients: { english: 'Recipients', arabic: 'المستلمون' }, selectMember: { english: 'Select Member', arabic: 'اختر عضو' }, message: { english: 'Message', arabic: 'الرسالة' }, messagePlaceholder: { english: 'Type your message...', arabic: 'اكتب رسالتك...' }, sendMessage: { english: 'Send Message', arabic: 'إرسال الرسالة' }, messageHistory: { english: 'Message History', arabic: 'سجل الرسائل' },
+        advancedReports: { english: 'Advanced Reports', arabic: 'تقارير متقدمة' }, memberGrowth: { english: 'Member Growth', arabic: 'نمو الأعضاء' }, memberGrowthDesc: { english: 'Shows members joined each month.', arabic: 'يعرض الأعضاء المنضمين كل شهر.'},
+        subscriptionsReport: { english: 'Subscriptions Report', arabic: 'تقرير الاشتراكات' }, subscriptionsReportDesc: { english: 'Detailed subscription data.', arabic: 'بيانات الاشتراكات المفصلة.'},
+        changePassword: { english: 'Change Password', arabic: 'تغيير كلمة المرور'}, changePasswordDesc: { english: 'Update the system access password.', arabic: 'تحديث كلمة مرور الدخول للنظام.'},
+        currentPassword: { english: 'Current Password', arabic: 'كلمة المرور الحالية'}, newPassword: { english: 'New Password', arabic: 'كلمة المرور الجديدة'}, confirmPassword: { english: 'Confirm New Password', arabic: 'تأكيد كلمة المرور الجديدة'},
+        dataManagement: { english: 'Data Management', arabic: 'إدارة البيانات' }, dataManagementDesc: { english: 'Application-level actions.', arabic: 'إجراءات على مستوى التطبيق.' }, resetData: { english: 'Reset All Data', arabic: 'إعادة تعيين البيانات' }, resetDataWarning: { english: "Warning: This action is permanent and will require a page reload.", arabic: "تحذير: هذا الإجراء دائم وسيتطلب إعادة تحميل الصفحة." },
+        downloadData: { english: 'Download Data', arabic: 'تنزيل البيانات' }, importData: { english: 'Import Data', arabic: 'استيراد البيانات' },
+        addMemberTitle: { english: 'Add New Member', arabic: 'إضافة عضو جديد' }, editMemberTitle: { english: 'Edit Member', arabic: 'تعديل بيانات عضو' },
+        firstName: { english: 'First Name', arabic: 'الاسم الأول' }, lastName: { english: 'Last Name', arabic: 'اسم العائلة' }, phone: { english: 'Phone', arabic: 'الهاتف' }, email: { english: 'Email', arabic: 'البريد الإلكتروني' }, emailOptional: { english: 'Email (Optional)', arabic: 'البريد (اختياري)'},
+        prefLanguage: { english: 'Preferred Language', arabic: 'اللغة المفضلة' }, addRenewSubTitle: { english: 'Add/Renew Subscription', arabic: 'إضافة/تجديد اشتراك' }, subType: { english: 'Type', arabic: 'النوع' },
+        startDate: { english: 'Start Date', arabic: 'تاريخ البدء' }, member: { english: 'Member', arabic: 'العضو' }, password: { english: 'Password', arabic: 'كلمة المرور' }, login: { english: 'Login', arabic: 'دخول' }, memberDetailsTitle: { english: 'Member Details', arabic: 'تفاصيل العضو' },
+        selectPlaceholder: { english: 'Select...', arabic: 'اختر...' }, noMessages: { english: 'No message history.', arabic: 'لا يوجد سجل رسائل.' }, noSubData: { english: 'No subscription data.', arabic: 'لا توجد بيانات اشتراك.' }, noMembersFound: { english: 'No members found.', arabic: 'لم يتم العثور على أعضاء.' },
+        subscriptionManagement: { english: 'Subscription Management', arabic: 'إدارة الاشتراكات' }, addSubType: { english: 'Add Subscription Type', arabic: 'إضافة نوع اشتراك' },
+        subName: { english: 'Name', arabic: 'الاسم' }, durationInDays: { english: 'Duration (Days)', arabic: 'المدة (بالأيام)' }, price: { english: 'Price', arabic: 'السعر' },
+        addTransaction: { english: 'Add Transaction', arabic: 'إضافة معاملة' }, date: { english: 'Date', arabic: 'التاريخ' }, description: { english: 'Description', arabic: 'الوصف' },
+        type: { english: 'Type', arabic: 'النوع' }, amount: { english: 'Amount', arabic: 'المبلغ' }, income: { english: 'Income', arabic: 'إيراد' }, expense: { english: 'Expense', arabic: 'مصروف' },
+        noSubTypes: { english: 'No subscription types defined.', arabic: 'لا توجد أنواع اشتراكات معرفة.' }, noTransactions: { english: 'No financial transactions recorded.', arabic: 'لا توجد معاملات مالية مسجلة.' },
+        alertSubTypeAdded: { english: 'Subscription type added successfully.', arabic: 'تمت إضافة نوع الاشتراك بنجاح.'}, alertSubTypeUpdated: { english: 'Subscription type updated successfully.', arabic: 'تم تحديث نوع الاشتراك بنجاح.'},
+        alertConfirmDeleteSubType: { english: 'Are you sure you want to delete this subscription type?', arabic: 'هل أنت متأكد من حذف نوع الاشتراك هذا؟' },
+        alertTransactionAdded: { english: 'Transaction added successfully.', arabic: 'تمت إضافة المعاملة بنجاح.'},
+        editTransaction: { english: 'Edit Transaction', arabic: 'تعديل المعاملة' },
+        alertTransactionUpdated: { english: 'Transaction updated successfully.', arabic: 'تم تحديث المعاملة بنجاح.'},
+        alertConfirmDeleteTransaction: { english: 'Are you sure you want to delete this transaction?', arabic: 'هل أنت متأكد من حذف هذه المعاملة؟' },
+        transactionTypeOptions: { income: { english: "Income", arabic: "إيراد" }, expense: { english: "Expense", arabic: "مصروف" } },
+        genderOptions: { male: { english: "Male", arabic: "ذكر" }, female: { english: "Female", arabic: "أنثى" } },
+        languageOptions: { english: { english: "English", arabic: "الإنجليزية" }, arabic: { english: "Arabic", arabic: "العربية" } },
+        recipientsOptions: { all: {english: "All Members", arabic: "كل الأعضاء"}, active: {english: "Active Subscribers", arabic: "المشتركون النشطون"}, expiring: {english: "Expiring Soon", arabic: "الاشتراكات المنتهية قريبا"}, male: {english: "Male Members", arabic: "الأعضاء الذكور"}, female: {english: "Female Members", arabic: "الأعضاء الإناث"}, individual: {english: "Individual Member", arabic: "عضو محدد"} },
+        messageHistoryHeaders: {date: {english: "Date", arabic: "التاريخ"}, recipients: {english: "Recipients", arabic: "المستلمون"}, message: {english: "Message", arabic: "الرسالة"}, status: {english: "Status", arabic: "الحالة"} },
+        subscriptionsReportHeaders: { memberName: {english: "Member Name", arabic: "اسم العضو"}, subType: {english: "Sub. Type", arabic: "نوع الاشتراك"}, startDate: {english: "Start Date", arabic: "تاريخ البدء"}, endDate: {english: "End Date", arabic: "تاريخ الانتهاء"}, status: {english: "Status", arabic: "الحالة"} },
+        alertMemberAdded: { english: "Member added successfully!", arabic: "تمت إضافة العضو بنجاح!" },
+        alertMemberUpdated: { english: "Member details updated.", arabic: "تم تحديث بيانات العضو." },
+        alertConfirmDelete: { english: "Are you sure you want to delete this member?", arabic: "هل أنت متأكد من رغبتك في حذف هذا العضو؟" },
+        alertMemberDeleted: { english: "Member deleted.", arabic: "تم حذف العضو." },
+        alertSubUpdated: { english: "Subscription saved successfully.", arabic: "تم حفظ الاشتراك بنجاح." },
+        alertIncorrectPassword: { english: "Incorrect password.", arabic: "كلمة المرور غير صحيحة." },
+        formValidation: { english: "Please fill in all required fields.", arabic: "يرجى ملء جميع الحقول المطلوبة." },
+        alertInvalidDate: { english: 'Invalid start date.', arabic: 'تاريخ البدء غير صالح.'},
+        alertSelectIndividual: { english: 'Please select an individual member.', arabic: 'الرجاء اختيار عضو محدد.'},
+        alertEmptyMessage: { english: 'Message content cannot be empty.', arabic: 'محتوى الرسالة لا يمكن أن يكون فارغًا.'},
+        alertMessageSentTo: (recipient) => ({ english: `Message successfully sent to: ${recipient}`, arabic: `تم إرسال الرسالة بنجاح إلى: ${recipient}`}[currentLanguage]),
+        alertSmsApiFailure: { english: 'SMS API simulation failed. Check the console for details.', arabic: 'فشلت محاكاة إرسال الرسائل. تحقق من الـ console للمزيد من التفاصيل.'},
+        alertNoValidPhones: { english: 'No members with valid phone numbers in the selected group.', arabic: 'لا يوجد أعضاء بأرقام هواتف صالحة في المجموعة المحددة.'},
+        alertPasswordMismatch: { english: 'New passwords do not match.', arabic: 'كلمتا المرور الجديدتان غير متطابقتين.'},
+        alertPasswordEmpty: { english: 'New password cannot be empty.', arabic: 'كلمة المرور الجديدة لا يمكن أن تكون فارغة.'},
+        alertPasswordChanged: { english: 'Password changed successfully.', arabic: 'تم تغيير كلمة المرور بنجاح.'}
+    };
+
+    function showSpinner(text = 'Loading...') {
+        document.getElementById('loading-text').textContent = text;
+        document.getElementById('loading-spinner').classList.remove('d-none');
+    }
+
+    function hideSpinner() {
+        document.getElementById('loading-spinner').classList.add('d-none');
+    }
+
+    async function apiCall(url, options = {}) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API Error (${response.status}): ${errorText}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("API Call Failed:", error);
+            alert(`An error occurred: ${error.message}. Please check the console and your network connection.`);
+            return null;
+        }
+    }
+
+    function getSystemPassword() {
+        const pwd = passwords.find(p => p.key === 'system_password');
+        return pwd ? pwd.value : 'admin123';
+    }
+
+    function getFinancialsPassword() {
+        const pwd = passwords.find(p => p.key === 'financials_password');
+        return pwd ? pwd.value : 'finance456';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        document.getElementById('password').focus();
+        setLanguage(currentLanguage);
+    });
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const passwordInput = document.getElementById('password').value;
+        const errorMsg = document.getElementById('login-error-msg');
+        
+        showSpinner("Verifying...");
+        
+        const fetchedPasswords = await apiCall(`${API_URL}?sheet=${SHEETS.passwords}`);
+        
+        if (!fetchedPasswords) {
+            hideSpinner();
+            errorMsg.textContent = "Could not connect to the database to verify password.";
+            errorMsg.style.display = 'block';
+            return;
+        }
+        passwords = fetchedPasswords;
+        
+        if (passwordInput === getSystemPassword()) {
+            errorMsg.style.display = 'none';
+            document.getElementById('login-screen').style.display = 'none';
+            document.querySelector('.main-container').classList.remove('d-none');
+            await initializeApp();
+        } else {
+            errorMsg.style.display = 'block';
+            document.getElementById('password').value = '';
+        }
+        hideSpinner();
+    }
+
+    async function initializeApp() {
+        console.log("Vorta Fitness Initializing from Google Sheets..."); 
+        showSpinner("Loading gym data...");
+
+        try {
+            const [
+                membersData, 
+                transactionsData, 
+                subscriptionTypesData, 
+                messageHistoryData
+            ] = await Promise.all([
+                apiCall(`${API_URL}?sheet=${SHEETS.members}`),
+                apiCall(`${API_URL}?sheet=${SHEETS.transactions}`),
+                apiCall(`${API_URL}?sheet=${SHEETS.subTypes}`),
+                apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`)
+            ]);
+
+            members = parseMembers(membersData || []);
+            transactions = parseTransactions(transactionsData || []);
+            subscriptionTypes = parseSubscriptionTypes(subscriptionTypesData || []);
+            messageHistory = parseMessageHistory(messageHistoryData || []);
+            
+            setupEventListeners(); 
+            showTab('dashboard'); 
+            console.log("Vorta Fitness is Ready.");
+        } catch (error) {
+            console.error("Initialization failed:", error);
+            alert("Failed to load application data. Please check your connection and refresh.");
+        } finally {
+            hideSpinner();
+        }
+    }
+    
+    function parseMembers(data) {
+        return data.map(m => ({
+            ...m,
+            id: parseInt(m.id, 10),
+            subscriptionId: m.subscriptionId ? parseInt(m.subscriptionId, 10) : null,
+            subscriptionPrice: m.subscriptionPrice ? parseFloat(m.subscriptionPrice) : null,
+            subscriptionStartDate: m.subscriptionStartDate ? new Date(m.subscriptionStartDate) : null,
+            subscriptionEndDate: m.subscriptionEndDate ? new Date(m.subscriptionEndDate) : null,
+            subscriptionActive: m.subscriptionActive === 'TRUE',
+            createdAt: m.createdAt ? new Date(m.createdAt) : new Date()
+        }));
+    }
+
+    function parseTransactions(data) {
+        return data.map(t => ({
+            ...t,
+            id: parseInt(t.id, 10),
+            amount: parseFloat(t.amount),
+            date: t.date ? new Date(t.date) : new Date(),
+            memberId: t.memberId ? parseInt(t.memberId, 10) : null
+        }));
+    }
+
+    function parseSubscriptionTypes(data) {
+        return data.map(st => ({
+            ...st,
+            id: parseInt(st.id, 10),
+            durationDays: parseInt(st.durationDays, 10),
+            price: parseFloat(st.price)
+        }));
+    }
+    
+    function parseMessageHistory(data) {
+        return data.map(msg => ({
+            ...msg,
+            sentAt: msg.sentAt ? new Date(msg.sentAt) : new Date()
+        }));
+    }
+
+    function setupEventListeners() {
+        document.querySelector('.main-sidebar').addEventListener('click', handleNavClick);
+        document.querySelector('.btn-group-lang').addEventListener('click', (e) => e.target.closest('[data-lang]') && setLanguage(e.target.dataset.lang));
+        ['add-member-form', 'edit-member-form', 'subscription-form', 'change-password-form', 'subscription-type-form', 'add-transaction-form'].forEach(id => {
+            document.getElementById(id)?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                switch (id) {
+                    case 'add-member-form': await addMember(); break;
+                    case 'edit-member-form': await saveMemberChanges(); break;
+                    case 'subscription-form': await saveSubscription(); break;
+                    case 'change-password-form': await handleChangePassword(); break;
+                    case 'subscription-type-form': await saveSubscriptionType(); break;
+                    case 'add-transaction-form': await saveTransaction(); break;
+                }
+            });
+        });
+        document.getElementById('message-form')?.addEventListener('submit', async (e) => { e.preventDefault(); await sendMessage(); });
+        document.getElementById('member-search').addEventListener('input', () => filterMembersTable());
+        document.getElementById('message-recipients').addEventListener('change', (e) => document.getElementById('individual-select-container').classList.toggle('d-none', e.target.value !== 'individual'));
+        
+        document.getElementById('dashboard-tab').addEventListener('click', (e) => {
+            const card = e.target.closest('.clickable-card');
+            if (card) {
+                dashboardFilter = card.dataset.filter;
+                document.getElementById('member-search').value = '';
+                document.querySelectorAll("#members-tab .btn-group button").forEach(btn => btn.classList.toggle('active', btn.dataset.gender === 'all'));
+                showTab('members');
+            }
+        });
+
+        document.getElementById('add-member-subscription-type').addEventListener('change', (e) => {
+            const subTypeId = e.target.value;
+            const priceInput = document.getElementById('add-member-subscription-price');
+            if (subTypeId) {
+                const subType = subscriptionTypes.find(st => st.id == subTypeId);
+                priceInput.value = subType ? subType.price : '';
+            } else {
+                priceInput.value = '';
+            }
+        });
+        document.getElementById('addMemberModal').addEventListener('show.bs.modal', populateAddMemberModal);
+        document.getElementById('subscriptionModal').addEventListener('show.bs.modal', populateSubscriptionModal);
+    }
+    
+    function formatCurrency(amount) {
+        return `₪${Number(amount).toFixed(2)}`;
+    }
+    
+    async function handleNavClick(e) { 
+        const navLink = e.target.closest('[data-tab]'); 
+        if (navLink) { 
+            e.preventDefault(); 
+            await showTab(navLink.dataset.tab); 
+        } 
+    }
+
+    async function showTab(tabName) {
+        if (tabName === 'financials') {
+            const enteredPassword = prompt("الرجاء إدخال كلمة المرور للوصول إلى صفحة المالية:");
+            const correctPassword = getFinancialsPassword();
+
+            if (enteredPassword !== correctPassword) {
+                alert("كلمة مرور غير صحيحة. تم رفض الوصول.");
+                return;
+            }
+        }
+
+        currentTab = tabName;
+        document.querySelectorAll('.content-tab').forEach(tab => tab.classList.add('d-none'));
+        document.getElementById(tabName + '-tab').classList.remove('d-none');
+        document.querySelectorAll('.main-sidebar [data-tab]').forEach(link => link.classList.toggle('active', link.dataset.tab === tabName));
+        const tabActions = { dashboard: refreshDashboard, members: loadMembers, financials: loadFinancialsPage, subscriptions: loadSubscriptionsPage, messaging: loadMessagingPage, reports: loadReportsPage, settings: () => {} };
+        tabActions[tabName]?.();
+    }
+
+    function refreshAllDynamicContent() { showTab(currentTab); }
+    function setLanguage(lang) {
+        currentLanguage = lang; localStorage.setItem('vortaFitnessLanguage', lang);
+        document.documentElement.dir = lang === 'arabic' ? 'rtl' : 'ltr'; document.documentElement.lang = lang === 'arabic' ? 'ar' : 'en';
+        document.querySelectorAll('.btn-group-lang button').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+        
+        document.querySelectorAll('[data-translate]').forEach(el => { const key = el.getAttribute('data-translate'); if(translations[key]?.[lang]){ el.placeholder ? el.placeholder = translations[key][lang] : el.textContent = translations[key][lang]; } });
+        document.querySelectorAll('[data-translate-options]').forEach(sel => { const key = sel.getAttribute('data-translate-options'); sel.innerHTML = Object.entries(translations[key]).map(([val, trans]) => `<option value="${val}">${trans[lang]}</option>`).join(''); });
+        document.querySelectorAll('[data-translate-headers]').forEach(thead => { const key = thead.getAttribute('data-translate-headers'); thead.rows[0].innerHTML = Object.values(translations[key]).map(trans => `<th class="text-end">${trans[lang]}</th>`).join('').replace('class="text-end">','>'); });
+
+        if (document.querySelector('.main-container.d-none')) { /* Do nothing, app not ready */ } 
+        else { refreshAllDynamicContent(); }
+    }
+
+    function refreshDashboard() { 
+        const activeMembers = members.filter(m => m.subscriptionActive);
+        const total = members.length;
+        const active = activeMembers.length;
+        const unsubscribed = total - active;
+        
+        const today = new Date(); today.setHours(0,0,0,0);
+        const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+        const expiring = activeMembers.filter(m => m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate).length;
+        
+        document.getElementById("total-members").textContent = total;
+        document.getElementById("active-subscriptions").textContent = active;
+        document.getElementById("expiring-subscriptions").textContent = expiring;
+        document.getElementById("unsubscribed-members").textContent = unsubscribed;
+        
+        const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const netProfit = totalIncome - totalExpenses;
+        document.getElementById("total-income").textContent = formatCurrency(totalIncome);
+        document.getElementById("total-expenses").textContent = formatCurrency(totalExpenses);
+        document.getElementById("net-profit").textContent = formatCurrency(netProfit);
+        
+        renderDashboardCharts();
+    }
+    
+    function renderDashboardCharts(){
+        if(typeof Chart === "undefined") return;
+        const m=members.filter(m => m.gender === "male").length;
+        const f=members.filter(m => m.gender === "female").length;
+        const g=document.getElementById("genderDistributionChart").getContext("2d");
+        if (genderChart) genderChart.destroy();
+        genderChart=new Chart(g,{type:"doughnut",data:{labels:["Male","Female"],datasets:[{data:[m,f],backgroundColor:["#0d6efd","#dc3545"],borderWidth:0}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{position:"top",labels:{color:"#f8f9fa"}}}}});
+        
+        const subTypeCounts = members.reduce((acc, member) => {
+            if (member.subscriptionActive) {
+                const subTypeName = member.subscriptionType || "Unknown";
+                acc[subTypeName] = (acc[subTypeName] || 0) + 1;
+            }
+            return acc;
+        }, {});
+        const c = document.getElementById("subscriptionTypeChart").getContext("2d");
+        if(subscriptionChart) subscriptionChart.destroy();
+        subscriptionChart=new Chart(c,{type:"bar",data:{labels: Object.keys(subTypeCounts), datasets:[{data: Object.values(subTypeCounts), backgroundColor:["#198754","#ffc107","#0dcaf0","#6f42c1", "#e83e8c"]}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{beginAtZero:!0,grid:{color:"#3b3e47"},ticks:{color:"#f8f9fa",stepSize:1}},x:{grid:{display:!1},ticks:{color:"#f8f9fa"}}}}});
+    }
+    
+    function loadMembers() {
+        let filteredMembers = [...members]; 
+        if (dashboardFilter) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+            switch (dashboardFilter) {
+                case 'active': filteredMembers = filteredMembers.filter(m => m.subscriptionActive); break;
+                case 'expiring': filteredMembers = filteredMembers.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
+                case 'unsubscribed': filteredMembers = filteredMembers.filter(m => !m.subscriptionActive); break;
+            }
+            dashboardFilter = null;
+        }
+        const activeGender = document.querySelector("#members-tab .btn-group button.active").dataset.gender;
+        if (activeGender !== 'all') { filteredMembers = filteredMembers.filter(m => m.gender === activeGender); }
+        const searchTerm = document.getElementById("member-search").value.toLowerCase();
+        if (searchTerm) { filteredMembers = filteredMembers.filter(m => `${m.firstName} ${m.lastName}`.toLowerCase().includes(searchTerm) || m.phone.includes(searchTerm) || m.email?.toLowerCase().includes(searchTerm)); }
+        renderMembersTable(filteredMembers);
+    }
+    function filterMembersByGender(gender){document.querySelectorAll("#members-tab .btn-group button").forEach(e=>e.classList.toggle("active",e.dataset.gender===gender));loadMembers()}
+    function filterMembersTable(){loadMembers()}
+    
+    function renderMembersTable(data){
+        const tbody=document.getElementById("members-table").querySelector("tbody");
+        tbody.innerHTML="";
+        if(data.length===0){
+            tbody.innerHTML=`<tr><td colspan="7" class="text-center py-4" data-translate="noMembersFound">${translations.noMembersFound[currentLanguage]}</td></tr>`;
+            return;
+        }
+        const today = new Date(); today.setHours(0,0,0,0);
+        data.forEach(member => {
+            let status, statusClass;
+            if(member.subscriptionActive) {
+                const endDate = member.subscriptionEndDate;
+                const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+                if(daysLeft < 0) {
+                    status = "Expired"; statusClass = "danger";
+                } else if (daysLeft <= EXPIRATION_REMINDER_DAYS) {
+                    status = `Expiring (${daysLeft}d)`; statusClass = "warning";
+                } else {
+                    status = "Active"; statusClass = "success";
+                }
+            } else {
+                status = "None"; statusClass = "secondary";
+            }
+            const row = tbody.insertRow();
+            row.innerHTML=`<td>${member.id}</td><td>${member.firstName} ${member.lastName}</td><td><i class="fas fa-${member.gender==="male"?"male text-primary":"female text-danger"} me-2"></i> ${member.gender}</td><td><div>${member.phone}</div><div class="small text-muted">${member.email||""}</div></td><td class="text-capitalize">${member.subscriptionType||"N/A"}</td><td><span class="badge bg-${statusClass}">${status}</span></td><td><div class="dropdown"><button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-translate="actions">${translations.actions[currentLanguage]}</button><ul class="dropdown-menu dropdown-menu-dark"><li><a class="dropdown-item" href="#" onclick="viewMember(${member.id})"><i class="fas fa-eye fa-fw me-2"></i><span data-translate="view">${translations.view[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="editMember(${member.id})"><i class="fas fa-edit fa-fw me-2"></i><span data-translate="edit">${translations.edit[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="addSubscriptionForMember(${member.id})"><i class="fas fa-sync fa-fw me-2"></i><span data-translate="renewSub">${translations.renewSub[currentLanguage]}</span></a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="#" onclick="deleteMember(${member.id})"><i class="fas fa-trash fa-fw me-2"></i><span data-translate="delete">${translations.delete[currentLanguage]}</span></a></li></ul></div></td>`;
+        });
+    }
+    
+    async function addMember(){
+        const form = document.getElementById("add-member-form");
+        const firstName = form.querySelector("#add-first-name").value.trim();
+        const lastName = form.querySelector("#add-last-name").value.trim();
+        const phone = form.querySelector("#add-phone").value.trim();
+        if(!firstName || !lastName || !phone) return alert(translations.formValidation[currentLanguage]);
+
+        const newId = members.length > 0 ? Math.max(...members.map(t => t.id)) + 1 : 1;
+        
+        const newMemberData = {
+            id: newId,
+            firstName: firstName,
+            lastName: lastName,
+            gender: form.querySelector("#add-gender").value,
+            phone: phone,
+            email: form.querySelector("#add-email").value.trim(),
+            language: form.querySelector("#add-language").value,
+            createdAt: new Date().toISOString()
+        };
+
+        const subTypeId = form.querySelector("#add-member-subscription-type").value;
+        let newTransactionData = null;
+
+        if (subTypeId) {
+            const subType = subscriptionTypes.find(st => st.id == subTypeId);
+            if (subType) {
+                const startDate = new Date();
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + subType.durationDays);
+                
+                Object.assign(newMemberData, {
+                    subscriptionId: Date.now(),
+                    subscriptionType: subType.name_english,
+                    subscriptionPrice: subType.price,
+                    subscriptionStartDate: startDate.toISOString(),
+                    subscriptionEndDate: endDate.toISOString(),
+                    subscriptionActive: 'TRUE'
+                });
+
+                newTransactionData = {
+                    id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
+                    date: new Date().toISOString(),
+                    description: `Subscription: ${newMemberData.firstName} ${newMemberData.lastName}`,
+                    type: 'income',
+                    amount: subType.price,
+                    memberId: newMemberData.id
+                };
+            }
+        }
+
+        showSpinner("Adding member...");
+        
+        const memberPayload = { data: [newMemberData] };
+        const memberResult = await apiCall(`${API_URL}?sheet=${SHEETS.members}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(memberPayload)
+        });
+
+        if (memberResult && newTransactionData) {
+            const transactionPayload = { data: [newTransactionData] };
+            await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(transactionPayload)
+            });
+            transactions.push(parseTransactions([newTransactionData])[0]);
+        }
+        
+        hideSpinner();
+
+        if (memberResult) {
+            members.push(parseMembers([newMemberData])[0]);
+            const modal = form.closest('.modal');
+            bootstrap.Modal.getInstance(modal).hide();
+            form.reset();
+            alert(translations.alertMemberAdded[currentLanguage]);
+            refreshAllDynamicContent();
+        }
+    }
+
+    function editMember(id){
+        const member=members.find(m=>m.id===id);
+        if(!member) return;
+        const form=document.getElementById("edit-member-form");
+        form.querySelector("#edit-member-id").value=member.id;
+        form.querySelector("#edit-first-name").value=member.firstName;
+        form.querySelector("#edit-last-name").value=member.lastName;
+        form.querySelector("#edit-phone").value=member.phone;
+        form.querySelector("#edit-email").value=member.email||"";
+        form.querySelector("#edit-gender").value=member.gender;
+        form.querySelector("#edit-language").value=member.language;
+        const modalEl = form.closest(".modal");
+        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+    }
+    
+    async function saveMemberChanges(){
+        const form = document.getElementById("edit-member-form");
+        const memberId = parseInt(form.querySelector("#edit-member-id").value);
+        
+        const updatedData = {
+            firstName: form.querySelector("#edit-first-name").value.trim(),
+            lastName: form.querySelector("#edit-last-name").value.trim(),
+            phone: form.querySelector("#edit-phone").value.trim(),
+            email: form.querySelector("#edit-email").value.trim(),
+            gender: form.querySelector("#edit-gender").value,
+            language: form.querySelector("#edit-language").value
+        };
+
+        showSpinner("Saving changes...");
+        const result = await apiCall(`${API_URL}/id/${memberId}?sheet=${SHEETS.members}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: updatedData })
+        });
+        hideSpinner();
+
+        if (result) {
+            const memberIndex = members.findIndex(m => m.id === memberId);
+            if (memberIndex > -1) {
+                members[memberIndex] = { ...members[memberIndex], ...updatedData };
+            }
+            const modal = form.closest(".modal");
+            bootstrap.Modal.getInstance(modal).hide();
+            alert(translations.alertMemberUpdated[currentLanguage]);
+            refreshAllDynamicContent();
+        }
+    }
+    
+    async function deleteMember(id){
+        if(confirm(translations.alertConfirmDelete[currentLanguage])){
+            showSpinner("Deleting member...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.members}`, { method: 'DELETE' });
+            hideSpinner();
+
+            if(result) {
+                members = members.filter(m => m.id !== id);
+                alert(translations.alertMemberDeleted[currentLanguage]);
+                refreshAllDynamicContent();
+            }
+        }
+    }
+
+    function viewMember(id){
+        const e=members.find(e=>e.id===id);
+        if(!e)return;
+        let subDetails=`<p>${translations.unsubscribed[currentLanguage]}</p>`;
+        if(e.subscriptionActive){
+            const subName=e.subscriptionType;
+            const endDate=new Date(e.subscriptionEndDate).toLocaleDateString();
+            const price=formatCurrency(e.subscriptionPrice);
+            subDetails=`<p><strong>${translations.subscription[currentLanguage]}:</strong> ${subName}</p><p><strong>${translations.price[currentLanguage]}:</strong> ${price}</p><p><strong>Ends:</strong> ${endDate}</p>`;
+        }
+        document.getElementById("viewMemberModalBody").innerHTML=`<h6>${e.firstName} ${e.lastName} <span class="badge bg-secondary">ID:${e.id}</span></h6><hr><p><strong>${translations.phone[currentLanguage]}:</strong> ${e.phone}</p>${subDetails}`;
+        const modalEl = document.getElementById("viewMemberModal");
+        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+    }
+    
+    function addSubscriptionForMember(id){
+        const e=members.find(e=>e.id===id);
+        if(!e) return;
+        const form=document.getElementById("subscription-form");
+        form.querySelector("#subscription-member-id").value=id;
+        form.querySelector("#subscription-member-name").textContent=`${e.firstName} ${e.lastName}`;
+        form.querySelector("#subscription-start-date").valueAsDate=new Date;
+        const modalEl = form.closest(".modal");
+        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+    }
+    
+    async function saveSubscription(){
+        const form = document.getElementById("subscription-form");
+        const memberId = parseInt(form.querySelector("#subscription-member-id").value);
+        const memberIndex = members.findIndex(m => m.id === memberId);
+        if (memberIndex === -1) return;
+
+        const subTypeId = form.querySelector("#subscription-modal-type").value;
+        const subType = subscriptionTypes.find(st => st.id == subTypeId);
+        if (!subType) return;
+        
+        const startDate = new Date(form.querySelector("#subscription-start-date").value);
+        if (isNaN(startDate.getTime())) return alert(translations.alertInvalidDate[currentLanguage]);
+        
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + subType.durationDays);
+
+        const memberUpdateData = {
+            subscriptionId: Date.now(),
+            subscriptionType: subType.name_english,
+            subscriptionPrice: subType.price,
+            subscriptionStartDate: startDate.toISOString(),
+            subscriptionEndDate: endDate.toISOString(),
+            subscriptionActive: 'TRUE'
+        };
+
+        const newTransactionData = {
+            id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
+            date: new Date().toISOString(),
+            description: `Subscription: ${members[memberIndex].firstName} ${members[memberIndex].lastName}`,
+            type: 'income',
+            amount: subType.price,
+            memberId: memberId
+        };
+        
+        showSpinner("Saving subscription...");
+        const [memberResult, transactionResult] = await Promise.all([
+            apiCall(`${API_URL}/id/${memberId}?sheet=${SHEETS.members}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: memberUpdateData })
+            }),
+            apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [newTransactionData] })
+            })
+        ]);
+        hideSpinner();
+
+        if (memberResult && transactionResult) {
+            Object.assign(members[memberIndex], parseMembers([memberUpdateData])[0]);
+            transactions.push(parseTransactions([newTransactionData])[0]);
+            
+            const modal = form.closest('.modal');
+            bootstrap.Modal.getInstance(modal).hide();
+            alert(translations.alertSubUpdated[currentLanguage]);
+            refreshAllDynamicContent();
+        }
+    }
+
+    function loadFinancialsPage() {
+        const tbody = document.getElementById("financials-table").querySelector("tbody");
+        tbody.innerHTML = "";
+        if (transactions.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4" data-translate="noTransactions">${translations.noTransactions[currentLanguage]}</td></tr>`;
+            return;
+        }
+        transactions.sort((a,b) => b.date - a.date).forEach(t => {
+            const row = tbody.insertRow();
+            const typeClass = t.type === 'income' ? 'text-success' : 'text-danger';
+            row.innerHTML = `<td>${t.date.toLocaleDateString()}</td><td>${t.description}</td><td><span class="${typeClass} fw-bold">${translations[t.type][currentLanguage]}</span></td><td class="text-end ${typeClass} fw-bold">${formatCurrency(t.amount)}</td><td class="text-end"><button class="btn btn-sm btn-outline-primary me-2" onclick="prepareEditTransactionModal(${t.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td>`;
+        });
+    }
+    
+    function prepareAddTransactionModal() {
+        const form = document.getElementById('add-transaction-form'); form.reset(); form.querySelector('#transaction-id').value = '';
+        document.getElementById('transactionModalLabel').textContent = translations.addTransaction[currentLanguage];
+    }
+
+    function prepareEditTransactionModal(id) {
+        const transaction = transactions.find(t => t.id === id); if (!transaction) return;
+        const form = document.getElementById('add-transaction-form'); form.reset();
+        document.getElementById('transactionModalLabel').textContent = translations.editTransaction[currentLanguage];
+        form.querySelector('#transaction-id').value = transaction.id; form.querySelector('#transaction-type').value = transaction.type;
+        form.querySelector('#transaction-description').value = transaction.description; form.querySelector('#transaction-amount').value = transaction.amount;
+        const modalEl = document.getElementById('addTransactionModal');
+        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+    }
+    
+    async function saveTransaction() {
+        const form = document.getElementById('add-transaction-form');
+        const id = form.querySelector('#transaction-id').value;
+        const type = form.querySelector('#transaction-type').value;
+        const description = form.querySelector('#transaction-description').value.trim();
+        const amount = parseFloat(form.querySelector('#transaction-amount').value);
+
+        if (!description || isNaN(amount) || amount < 0) { return alert(translations.formValidation[currentLanguage]); }
+        
+        showSpinner("Saving transaction...");
+        if (id) {
+            const dataToUpdate = { type, description, amount };
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.transactions}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: dataToUpdate })
+            });
+            if (result) {
+                const index = transactions.findIndex(t => t.id == id);
+                if (index > -1) { Object.assign(transactions[index], dataToUpdate); }
+                alert(translations.alertTransactionUpdated[currentLanguage]);
+            }
+        } else {
+            const newId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
+            const newTransaction = { id: newId, date: new Date().toISOString(), description, type, amount };
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: [newTransaction] })
+            });
+             if (result) {
+                transactions.push(parseTransactions([newTransaction])[0]);
+                alert(translations.alertTransactionAdded[currentLanguage]);
+             }
+        }
+        hideSpinner();
+        const modal = form.closest('.modal');
+        bootstrap.Modal.getInstance(modal).hide();
+        refreshAllDynamicContent();
+    }
+    
+    async function deleteTransaction(id) {
+        if (confirm(translations.alertConfirmDeleteTransaction[currentLanguage])) {
+            showSpinner("Deleting...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.transactions}`, { method: 'DELETE' });
+            hideSpinner();
+            if (result) {
+                transactions = transactions.filter(t => t.id !== id);
+                refreshAllDynamicContent();
+            }
+        }
+    }
+
+    function loadSubscriptionsPage() {
+        const tbody = document.getElementById("subscription-types-table").querySelector("tbody");
+        tbody.innerHTML = "";
+        if (subscriptionTypes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4" data-translate="noSubTypes">${translations.noSubTypes[currentLanguage]}</td></tr>`;
+            return;
+        }
+        subscriptionTypes.forEach(st => {
+            const row = tbody.insertRow();
+            row.innerHTML = `<td>${currentLanguage === 'arabic' ? st.name_arabic : st.name_english}</td><td>${st.durationDays}</td><td>${formatCurrency(st.price)}</td><td><button class="btn btn-sm btn-outline-primary me-2" onclick="prepareSubscriptionTypeModal(${st.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteSubscriptionType(${st.id})"><i class="fas fa-trash"></i></button></td>`;
+        });
+    }
+    
+    function prepareSubscriptionTypeModal(id) {
+        const form = document.getElementById('subscription-type-form'); form.reset();
+        const modalLabel = document.getElementById('subscriptionTypeModalLabel');
+        if (id) {
+            const subType = subscriptionTypes.find(st => st.id === id);
+            if (subType) {
+                modalLabel.textContent = `${translations.edit[currentLanguage]}: ${currentLanguage === 'arabic' ? subType.name_arabic : subType.name_english}`;
+                form.querySelector('#sub-type-id').value = subType.id;
+                form.querySelector('#sub-type-name-en').value = subType.name_english;
+                form.querySelector('#sub-type-name-ar').value = subType.name_arabic;
+                form.querySelector('#sub-type-duration').value = subType.durationDays;
+                form.querySelector('#sub-type-price').value = subType.price;
+            }
+        } else {
+            modalLabel.textContent = translations.addSubType[currentLanguage];
+            form.querySelector('#sub-type-id').value = '';
+        }
+        const modalEl = document.getElementById('subscriptionTypeModal');
+        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+    }
+    
+    async function saveSubscriptionType() {
+        const form = document.getElementById('subscription-type-form');
+        const id = form.querySelector('#sub-type-id').value;
+        const nameEn = form.querySelector('#sub-type-name-en').value.trim();
+        const nameAr = form.querySelector('#sub-type-name-ar').value.trim();
+        const duration = parseInt(form.querySelector('#sub-type-duration').value);
+        const price = parseFloat(form.querySelector('#sub-type-price').value);
+
+        if (!nameEn || !nameAr || isNaN(duration) || duration <= 0 || isNaN(price) || price < 0) { return alert(translations.formValidation[currentLanguage]); }
+        
+        showSpinner("Saving...");
+        if (id) {
+            const dataToUpdate = { name_english: nameEn, name_arabic: nameAr, durationDays: duration, price: price };
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.subTypes}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({data: dataToUpdate})
+            });
+            if (result) {
+                const index = subscriptionTypes.findIndex(st => st.id == id);
+                if (index > -1) { Object.assign(subscriptionTypes[index], dataToUpdate); }
+                alert(translations.alertSubTypeUpdated[currentLanguage]);
+            }
+        } else {
+            const newId = subscriptionTypes.length > 0 ? Math.max(...subscriptionTypes.map(st => st.id)) + 1 : 1;
+            const newSubType = { id: newId, name_english: nameEn, name_arabic: nameAr, durationDays: duration, price: price };
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.subTypes}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({data: [newSubType]})
+            });
+            if (result) {
+                subscriptionTypes.push(parseSubscriptionTypes([newSubType])[0]);
+                alert(translations.alertSubTypeAdded[currentLanguage]);
+            }
+        }
+        hideSpinner();
+        const modal = form.closest('.modal');
+        bootstrap.Modal.getInstance(modal).hide();
+        refreshAllDynamicContent();
+    }
+    
+    async function deleteSubscriptionType(id) {
+        if (confirm(translations.alertConfirmDeleteSubType[currentLanguage])) {
+            showSpinner("Deleting...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.subTypes}`, { method: 'DELETE' });
+            hideSpinner();
+            if (result) {
+                subscriptionTypes = subscriptionTypes.filter(st => st.id !== id);
+                loadSubscriptionsPage();
+            }
+        }
+    }
+    
+    function populateAddMemberModal() {
+        const select = document.getElementById('add-member-subscription-type');
+        select.innerHTML = `<option value="">-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
+        subscriptionTypes.forEach(st => {
+            const name = currentLanguage === 'arabic' ? st.name_arabic : st.name_english;
+            select.innerHTML += `<option value="${st.id}">${name}</option>`;
+        });
+        document.getElementById('add-member-subscription-price').value = '';
+    }
+
+    function populateSubscriptionModal() {
+        const select = document.getElementById('subscription-modal-type');
+        select.innerHTML = `<option value="" disabled selected>-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
+        subscriptionTypes.forEach(st => {
+            const name = currentLanguage === 'arabic' ? st.name_arabic : st.name_english;
+            select.innerHTML += `<option value="${st.id}">${name}</option>`;
+        });
+    }
+    
+    function loadReportsPage(){renderMemberGrowthChart();renderSubscriptionsReportTable()}
+    function renderMemberGrowthChart(){if("undefined"==typeof Chart)return;const t=document.getElementById("memberGrowthChart").getContext("2d"),e=members.reduce((a,t)=>{const e=new Date(t.createdAt).toLocaleString("en-US",{month:"short",year:"numeric"});return a[e]=(a[e]||0)+1,a},{}),o=Object.keys(e).sort((a,t)=>new Date(a)-new Date(t));let r=0;const n=o.map(a=>r+=e[a]);memberGrowthChart&&memberGrowthChart.destroy();memberGrowthChart=new Chart(t,{type:"line",data:{labels:o,datasets:[{label:"Total Members",data:n,borderColor:"#0d6efd",backgroundColor:"rgba(13, 110, 253, 0.1)",fill:!0,tension:.3}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{beginAtZero:!0,grid:{color:"#3b3e47"},ticks:{color:"#f8f9fa"}},x:{grid:{color:"transparent"},ticks:{color:"#f8f9fa"}}}}})}
+    function renderSubscriptionsReportTable(){const t=document.getElementById("subscriptions-report-table").querySelector("tbody");t.innerHTML="";const e=members.filter(t=>t.subscriptionActive);if(0===e.length)return void(t.innerHTML=`<tr><td colspan="5" class="text-center py-4" data-translate="noSubData">${translations.noSubData[currentLanguage]}</td></tr>`);const o=new Date;o.setHours(0,0,0,0),e.forEach(m=>{let r,n;const d=m.subscriptionEndDate,i=Math.ceil((d-o)/864e5);i<0?(r="Expired",n="danger"):i<=EXPIRATION_REMINDER_DAYS?(r="Expiring",n="warning"):(r="Active",n="success");const l=t.insertRow();l.innerHTML=`<td>${m.firstName} ${m.lastName}</td><td class="text-capitalize">${m.subscriptionType}</td><td>${m.subscriptionStartDate.toLocaleDateString()}</td><td>${d.toLocaleDateString()}</td><td><span class="badge bg-${n}">${r}</span></td>`})}
+    function loadMessagingPage(){const t=document.getElementById("individual-member");t.innerHTML=`<option value="" disabled selected>${translations.selectPlaceholder[currentLanguage]}</option>`,members.sort((t,e)=>t.firstName.localeCompare(e.firstName)).forEach(e=>t.innerHTML+=`<option value="${e.id}">${e.firstName} ${e.lastName}</option>`),renderMessageHistory()}
+    function renderMessageHistory(){const t=document.getElementById("message-history-table").querySelector("tbody");t.innerHTML="";if(0===messageHistory.length)return void(t.innerHTML=`<tr><td colspan="4" class="text-center py-4" data-translate="noMessages">${translations.noMessages[currentLanguage]}</td></tr>`);messageHistory.sort((t,e)=>e.sentAt-t.sentAt).forEach(e=>{const o=t.insertRow();o.innerHTML=`<td>${e.sentAt.toLocaleDateString()}</td><td>${e.recipients}</td><td class="text-truncate" style="max-width: 250px;">${e.message}</td><td><span class="badge bg-success">${e.status}</span></td>`})}
+    async function sendMessage() {
+        const recipientGroup = document.getElementById('message-recipients').value; const messageContent = document.getElementById('message-content').value.trim(); let recipientText = document.querySelector(`#message-recipients option[value="${recipientGroup}"]`).textContent; if (!messageContent) return alert(translations.alertEmptyMessage[currentLanguage]); let targetMembers = []; const today = new Date(); today.setHours(0, 0, 0, 0); const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+        switch (recipientGroup) {
+            case 'all': targetMembers = [...members]; break;
+            case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
+            case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
+            case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
+            case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
+            case 'individual': const memberId = document.getElementById('individual-member').value; if (!memberId) return alert(translations.alertSelectIndividual[currentLanguage]); const member = members.find(m => m.id == memberId); if (member) { targetMembers.push(member); recipientText = `${member.firstName} ${member.lastName}`; } break;
+        }
+        const phoneNumbers = targetMembers.map(m => m.phone).filter(phone => phone); if (phoneNumbers.length === 0) return alert(translations.alertNoValidPhones[currentLanguage]);
+        
+        showSpinner("Sending message...");
+        const newMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
+        const result = await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({data: [newMessage]})
+        });
+        hideSpinner();
+
+        if (result) { 
+            messageHistory.push(parseMessageHistory([newMessage])[0]); 
+            alert(translations.alertMessageSentTo(recipientText)); 
+            document.getElementById('message-form').reset(); 
+            document.getElementById('individual-select-container').classList.add('d-none'); 
+            renderMessageHistory(); 
+        } else { 
+            alert(translations.alertSmsApiFailure[currentLanguage]); 
+        } 
+    }
+
+    async function handleChangePassword() { 
+        const form = document.getElementById('change-password-form'); 
+        const currentPass = form.querySelector('#current-password').value; 
+        const newPass = form.querySelector('#new-password').value; 
+        const confirmPass = form.querySelector('#confirm-password').value; 
+        
+        if (currentPass !== getSystemPassword()) { alert(translations.alertIncorrectPassword[currentLanguage]); return; } 
+        if (!newPass) { alert(translations.alertPasswordEmpty[currentLanguage]); return; } 
+        if (newPass !== confirmPass) { alert(translations.alertPasswordMismatch[currentLanguage]); return; } 
+        
+        showSpinner("Updating password...");
+        const result = await apiCall(`${API_URL}/key/system_password?sheet=${SHEETS.passwords}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ data: { value: newPass } })
+        });
+        hideSpinner();
+
+        if (result) {
+            const pwdIndex = passwords.findIndex(p => p.key === 'system_password');
+            if (pwdIndex > -1) passwords[pwdIndex].value = newPass;
+            alert(translations.alertPasswordChanged[currentLanguage]); 
+            form.reset();
+        }
+    }
+</script>
+</body>
+</html>

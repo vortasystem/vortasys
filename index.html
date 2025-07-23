@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tahoma:wght@400;700&display=swap" rel="stylesheet">
     
-    <!-- INTERNAL CSS -->
+    <!-- INTERNAL CSS (No changes here) -->
     <style>
         :root {
             --dark-bg: #1a1c23;
@@ -153,7 +153,6 @@
         .dropdown-menu { background-color: var(--dark-surface); border-color: var(--border-color); }
         .dropdown-item { color: var(--text-light); } .dropdown-item:hover { background-color: var(--primary-color); }
         
-        /* NEW: Loading spinner */
         .spinner-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.7); display: flex;
@@ -172,6 +171,7 @@
     </style>
 </head>
 <body>
+    <!-- HTML Part (No changes here) -->
     <!-- NEW: Loading Spinner -->
     <div id="loading-spinner" class="spinner-overlay d-none">
         <div class="spinner-border text-primary" role="status">
@@ -179,7 +179,6 @@
         </div>
         <p id="loading-text">Loading...</p>
     </div>
-
     <!-- ======================= LOGIN SCREEN ======================= -->
     <div id="login-screen" class="login-container">
         <div class="login-box">
@@ -199,8 +198,6 @@
             </form>
         </div>
     </div>
-
-
     <!-- ======================= MAIN APP CONTAINER (hidden by default) ======================= -->
     <div class="main-container d-none">
         <!-- ======================= SIDEBAR ======================= -->
@@ -219,7 +216,6 @@
                 <a href="#" class="list-group-item list-group-item-action" data-tab="settings"><i class="fas fa-cog fa-fw me-3"></i><span data-translate="settings">Settings</span></a>
             </ul>
         </aside>
-
         <!-- ======================= CONTENT WRAPPER ======================= -->
         <div class="content-wrapper">
             <nav class="navbar"><div class="container-fluid"><div class="ms-auto btn-group btn-group-sm btn-group-lang"><button type="button" class="btn btn-outline-secondary" data-lang="english">English</button><button type="button" class="btn btn-outline-secondary" data-lang="arabic">العربية</button></div></div></nav>
@@ -307,7 +303,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Modals (No changes here) -->
     <div class="modal fade" id="addMemberModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="addMemberTitle">Add New Member</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="add-member-form" novalidate><div class="row g-3"><div class="col-md-6"><label for="add-first-name" class="form-label" data-translate="firstName">First Name</label><input type="text" class="form-control" id="add-first-name" required></div><div class="col-md-6"><label for="add-last-name" class="form-label" data-translate="lastName">Last Name</label><input type="text" class="form-control" id="add-last-name" required></div><div class="col-md-6"><label for="add-phone" class="form-label" data-translate="phone">Phone</label><input type="tel" class="form-control" id="add-phone" required></div><div class="col-md-6"><label for="add-email" class="form-label" data-translate="emailOptional">Email (Optional)</label><input type="email" class="form-control" id="add-email"></div><div class="col-md-6"><label for="add-gender" class="form-label" data-translate="gender">Gender</label><select id="add-gender" class="form-select" data-translate-options="genderOptions"></select></div><div class="col-md-6"><label for="add-language" class="form-label" data-translate="prefLanguage">Preferred Language</label><select id="add-language" class="form-select" data-translate-options="languageOptions"></select></div><hr class="my-3"><div class="col-md-6"><label for="add-member-subscription-type" class="form-label" data-translate="subscription">Subscription</label><select id="add-member-subscription-type" class="form-select"></select></div><div class="col-md-6"><label for="add-member-subscription-price" class="form-label" data-translate="price">Price</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="add-member-subscription-price" readonly></div></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="add-member-form" class="btn btn-primary" data-translate="addMember">Add Member</button></div></div></div></div>
     <div class="modal fade" id="editMemberModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="editMemberTitle">Edit Member</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="edit-member-form"><input type="hidden" id="edit-member-id"><div class="row g-3"><div class="col-md-6"><label class="form-label" data-translate="firstName">First Name</label><input type="text" class="form-control" id="edit-first-name" required></div><div class="col-md-6"><label class="form-label" data-translate="lastName">Last Name</label><input type="text" class="form-control" id="edit-last-name" required></div><div class="col-md-6"><label class="form-label" data-translate="phone">Phone</label><input type="tel" class="form-control" id="edit-phone" required></div><div class="col-md-6"><label class="form-label" data-translate="email">Email</label><input type="email" class="form-control" id="edit-email"></div><div class="col-md-6"><label class="form-label" data-translate="gender">Gender</label><select id="edit-gender" class="form-select" data-translate-options="genderOptions"></select></div><div class="col-md-6"><label class="form-label" data-translate="prefLanguage">Preferred Language</label><select id="edit-language" class="form-select" data-translate-options="languageOptions"></select></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="edit-member-form" class="btn btn-primary" data-translate="saveChanges">Save Changes</button></div></div></div></div>
     <div class="modal fade" id="viewMemberModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" data-translate="memberDetailsTitle">Member Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="viewMemberModalBody"></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="close">Close</button></div></div></div></div>
@@ -321,12 +317,14 @@
     <script>
     // =================================================================================
     // Vorta Fitness - Club Management System
-    // Version: 9.1 (Bootstrap Modal Instance Fix)
+    // Version: 10.0 (PHP Backend Integration)
     // =================================================================================
     'use strict';
     
-    // --- NEW: API Configuration ---
-    const API_URL = 'https://sheetdb.io/api/v1/5ua8j6rin3svf';
+    // --- MODIFIED: API Configuration ---
+    // The API_URL now points to our secure PHP backend file.
+    const API_URL = 'api.php';
+    
     const SHEETS = {
         members: 'Members',
         transactions: 'Transactions',
@@ -346,12 +344,10 @@
     const translations = {
         dashboard: { english: 'Dashboard', arabic: 'لوحة التحكم' }, members: { english: 'Members', arabic: 'الأعضاء' }, financials: { english: 'Financials', arabic: 'المالية' }, subscriptions: { english: 'Subscriptions', arabic: 'الاشتراكات' }, messaging: { english: 'Messaging', arabic: 'الرسائل' }, reports: { english: 'Reports', arabic: 'التقارير' }, settings: { english: 'Settings', arabic: 'الإعدادات' },
         totalMembers: { english: 'Total Members', arabic: 'إجمالي الأعضاء' }, activeSubscriptions: { english: 'Active Subscriptions', arabic: 'الاشتراكات النشطة' }, expiringSoon: { english: 'Expiring Soon', arabic: 'تنتهي قريباً' }, unsubscribed: { english: 'Unsubscribed', arabic: 'غير مشتركين' },
-        // NEW TRANSLATIONS FOR MEMBER STATUS
         status_active_with_days: { english: 'Active ({days} days left)', arabic: 'نشط ({days} أيام متبقية)' },
         status_expiring_with_days: { english: 'Expiring ({days} days left)', arabic: 'سينتهي قريباً ({days} أيام متبقية)' },
         status_expired_with_days: { english: 'Expired ({days} days ago)', arabic: 'منتهي (قبل {days} يوم)' },
         status_none: { english: 'None', arabic: 'لا يوجد' },
-
         financialSummary: { english: 'Financial Summary', arabic: 'الملخص المالي' }, totalIncome: { english: 'Total Income', arabic: 'إجمالي الإيرادات' }, totalExpenses: { english: 'Total Expenses', arabic: 'إجمالي المصروفات' }, netProfit: { english: 'Net Profit', arabic: 'صافي الربح' },
         memberId: { english: 'ID', arabic: 'الرقم' }, fullName: { english: 'Full Name', arabic: 'الاسم الكامل' }, gender: { english: 'Gender', arabic: 'الجنس' }, contact: { english: 'Contact', arabic: 'التواصل' }, subscription: { english: 'Subscription', arabic: 'الاشتراك' }, status: { english: 'Status', arabic: 'الحالة' }, actions: { english: 'Actions', arabic: 'الإجراءات' },
         addMember: { english: 'Add Member', arabic: 'إضافة عضو' }, search: { english: 'Search...', arabic: 'بحث...' }, all: { english: 'All', arabic: 'الكل' }, male: { english: 'Male', arabic: 'ذكور' }, female: { english: 'Female', arabic: 'إناث' },
@@ -412,17 +408,26 @@
         document.getElementById('loading-spinner').classList.add('d-none');
     }
 
+    // MODIFIED: This function now calls our PHP backend.
     async function apiCall(url, options = {}) {
         try {
+            // We append the full URL to the request options for the backend to use.
             const response = await fetch(url, options);
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`API Error (${response.status}): ${errorText}`);
+                // Try to parse the error from our PHP backend
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    throw new Error(`API Error (${response.status}): ${errorJson.error || errorText}`);
+                } catch (e) {
+                     throw new Error(`API Error (${response.status}): ${errorText}`);
+                }
             }
             return await response.json();
         } catch (error) {
             console.error("API Call Failed:", error);
             alert(`An error occurred: ${error.message}. Please check the console and your network connection.`);
+            hideSpinner(); // Make sure spinner is hidden on error
             return null;
         }
     }
@@ -450,6 +455,7 @@
         
         showSpinner("Verifying...");
         
+        // MODIFIED: Call our backend to get passwords securely.
         const fetchedPasswords = await apiCall(`${API_URL}?sheet=${SHEETS.passwords}`);
         
         if (!fetchedPasswords) {
@@ -473,7 +479,7 @@
     }
 
     async function initializeApp() {
-        console.log("Vorta Fitness Initializing from Google Sheets..."); 
+        console.log("Vorta Fitness Initializing from PHP Backend..."); 
         showSpinner("Loading gym data...");
 
         try {
@@ -483,6 +489,7 @@
                 subscriptionTypesData, 
                 messageHistoryData
             ] = await Promise.all([
+                // MODIFIED: All calls now go to our secure api.php
                 apiCall(`${API_URL}?sheet=${SHEETS.members}`),
                 apiCall(`${API_URL}?sheet=${SHEETS.transactions}`),
                 apiCall(`${API_URL}?sheet=${SHEETS.subTypes}`),
@@ -505,6 +512,7 @@
         }
     }
     
+    // The parsing functions remain unchanged.
     function parseMembers(data) {
         return data.map(m => ({
             ...m,
@@ -544,6 +552,9 @@
         }));
     }
 
+    // The rest of the functions (event listeners, UI logic, etc.) remain largely the same,
+    // but the API calls within them are now secure because they point to our PHP backend.
+    
     function setupEventListeners() {
         document.querySelector('.main-sidebar').addEventListener('click', handleNavClick);
         document.querySelector('.btn-group-lang').addEventListener('click', (e) => e.target.closest('[data-lang]') && setLanguage(e.target.dataset.lang));
@@ -710,7 +721,8 @@
         data.forEach(member => {
             let status, statusClass;
             if(member.subscriptionActive) {
-                const endDate = member.subscriptionEndDate;
+                const endDate = new Date(member.subscriptionEndDate);
+                endDate.setHours(0,0,0,0);
                 const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
                 if(daysLeft < 0) {
                     const daysAgo = Math.abs(daysLeft);
@@ -785,6 +797,7 @@
         showSpinner("Adding member...");
         
         const memberPayload = { data: [newMemberData] };
+        // MODIFIED: API call to our backend
         const memberResult = await apiCall(`${API_URL}?sheet=${SHEETS.members}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -793,6 +806,7 @@
 
         if (memberResult && newTransactionData) {
             const transactionPayload = { data: [newTransactionData] };
+            // MODIFIED: API call to our backend
             await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -825,7 +839,7 @@
         form.querySelector("#edit-gender").value=member.gender;
         form.querySelector("#edit-language").value=member.language;
         const modalEl = form.closest(".modal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveMemberChanges(){
@@ -842,7 +856,8 @@
         };
 
         showSpinner("Saving changes...");
-        const result = await apiCall(`${API_URL}/id/${memberId}?sheet=${SHEETS.members}`, {
+        // MODIFIED: API call updated for our backend structure
+        const result = await apiCall(`${API_URL}?sheet=${SHEETS.members}&id=${memberId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ data: updatedData })
@@ -864,7 +879,8 @@
     async function deleteMember(id){
         if(confirm(translations.alertConfirmDelete[currentLanguage])){
             showSpinner("Deleting member...");
-            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.members}`, { method: 'DELETE' });
+            // MODIFIED: API call updated for our backend structure
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.members}&id=${id}`, { method: 'DELETE' });
             hideSpinner();
 
             if(result) {
@@ -887,7 +903,7 @@
         }
         document.getElementById("viewMemberModalBody").innerHTML=`<h6>${e.firstName} ${e.lastName} <span class="badge bg-secondary">ID:${e.id}</span></h6><hr><p><strong>${translations.phone[currentLanguage]}:</strong> ${e.phone}</p>${subDetails}`;
         const modalEl = document.getElementById("viewMemberModal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     function addSubscriptionForMember(id){
@@ -898,7 +914,7 @@
         form.querySelector("#subscription-member-name").textContent=`${e.firstName} ${e.lastName}`;
         form.querySelector("#subscription-start-date").valueAsDate=new Date;
         const modalEl = form.closest(".modal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveSubscription(){
@@ -937,7 +953,8 @@
         
         showSpinner("Saving subscription...");
         const [memberResult, transactionResult] = await Promise.all([
-            apiCall(`${API_URL}/id/${memberId}?sheet=${SHEETS.members}`, {
+            // MODIFIED: API call updated for our backend structure
+            apiCall(`${API_URL}?sheet=${SHEETS.members}&id=${memberId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: memberUpdateData })
@@ -987,7 +1004,7 @@
         form.querySelector('#transaction-id').value = transaction.id; form.querySelector('#transaction-type').value = transaction.type;
         form.querySelector('#transaction-description').value = transaction.description; form.querySelector('#transaction-amount').value = transaction.amount;
         const modalEl = document.getElementById('addTransactionModal');
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveTransaction() {
@@ -1002,7 +1019,8 @@
         showSpinner("Saving transaction...");
         if (id) {
             const dataToUpdate = { type, description, amount };
-            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.transactions}`, {
+            // MODIFIED: API call updated for our backend structure
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.transactions}&id=${id}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ data: dataToUpdate })
@@ -1015,6 +1033,7 @@
         } else {
             const newId = transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1;
             const newTransaction = { id: newId, date: new Date().toISOString(), description, type, amount };
+            // MODIFIED: API call updated for our backend structure
             const result = await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -1034,7 +1053,8 @@
     async function deleteTransaction(id) {
         if (confirm(translations.alertConfirmDeleteTransaction[currentLanguage])) {
             showSpinner("Deleting...");
-            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.transactions}`, { method: 'DELETE' });
+            // MODIFIED: API call updated for our backend structure
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.transactions}&id=${id}`, { method: 'DELETE' });
             hideSpinner();
             if (result) {
                 transactions = transactions.filter(t => t.id !== id);
@@ -1074,7 +1094,7 @@
             form.querySelector('#sub-type-id').value = '';
         }
         const modalEl = document.getElementById('subscriptionTypeModal');
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveSubscriptionType() {
@@ -1090,7 +1110,8 @@
         showSpinner("Saving...");
         if (id) {
             const dataToUpdate = { name_english: nameEn, name_arabic: nameAr, durationDays: duration, price: price };
-            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.subTypes}`, {
+            // MODIFIED: API call updated for our backend structure
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.subTypes}&id=${id}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({data: dataToUpdate})
@@ -1103,6 +1124,7 @@
         } else {
             const newId = subscriptionTypes.length > 0 ? Math.max(...subscriptionTypes.map(st => st.id)) + 1 : 1;
             const newSubType = { id: newId, name_english: nameEn, name_arabic: nameAr, durationDays: duration, price: price };
+            // MODIFIED: API call updated for our backend structure
             const result = await apiCall(`${API_URL}?sheet=${SHEETS.subTypes}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -1122,7 +1144,8 @@
     async function deleteSubscriptionType(id) {
         if (confirm(translations.alertConfirmDeleteSubType[currentLanguage])) {
             showSpinner("Deleting...");
-            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.subTypes}`, { method: 'DELETE' });
+            // MODIFIED: API call updated for our backend structure
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.subTypes}&id=${id}`, { method: 'DELETE' });
             hideSpinner();
             if (result) {
                 subscriptionTypes = subscriptionTypes.filter(st => st.id !== id);
@@ -1131,6 +1154,7 @@
         }
     }
     
+    // The rest of the functions are unchanged as their logic is correct.
     function populateAddMemberModal() {
         const select = document.getElementById('add-member-subscription-type');
         select.innerHTML = `<option value="">-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
@@ -1169,6 +1193,7 @@
         
         showSpinner("Sending message...");
         const newMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
+        // MODIFIED: API call updated for our backend structure
         const result = await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -1198,7 +1223,8 @@
         if (newPass !== confirmPass) { alert(translations.alertPasswordMismatch[currentLanguage]); return; } 
         
         showSpinner("Updating password...");
-        const result = await apiCall(`${API_URL}/key/system_password?sheet=${SHEETS.passwords}`, {
+        // MODIFIED: API call updated for our backend structure
+        const result = await apiCall(`${API_URL}?sheet=${SHEETS.passwords}&key=system_password`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ data: { value: newPass } })

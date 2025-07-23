@@ -326,7 +326,7 @@
     'use strict';
     
     // --- NEW: API Configuration ---
-    const API_URL = '**********************';
+    const API_URL = 'https://sheetdb.io/api/v1/5ua8j6rin3svf';
     const SHEETS = {
         members: 'Members',
         transactions: 'Transactions',
@@ -346,6 +346,12 @@
     const translations = {
         dashboard: { english: 'Dashboard', arabic: 'لوحة التحكم' }, members: { english: 'Members', arabic: 'الأعضاء' }, financials: { english: 'Financials', arabic: 'المالية' }, subscriptions: { english: 'Subscriptions', arabic: 'الاشتراكات' }, messaging: { english: 'Messaging', arabic: 'الرسائل' }, reports: { english: 'Reports', arabic: 'التقارير' }, settings: { english: 'Settings', arabic: 'الإعدادات' },
         totalMembers: { english: 'Total Members', arabic: 'إجمالي الأعضاء' }, activeSubscriptions: { english: 'Active Subscriptions', arabic: 'الاشتراكات النشطة' }, expiringSoon: { english: 'Expiring Soon', arabic: 'تنتهي قريباً' }, unsubscribed: { english: 'Unsubscribed', arabic: 'غير مشتركين' },
+        // NEW TRANSLATIONS FOR MEMBER STATUS
+        status_active_with_days: { english: 'Active ({days} days left)', arabic: 'نشط ({days} أيام متبقية)' },
+        status_expiring_with_days: { english: 'Expiring ({days} days left)', arabic: 'سينتهي قريباً ({days} أيام متبقية)' },
+        status_expired_with_days: { english: 'Expired ({days} days ago)', arabic: 'منتهي (قبل {days} يوم)' },
+        status_none: { english: 'None', arabic: 'لا يوجد' },
+
         financialSummary: { english: 'Financial Summary', arabic: 'الملخص المالي' }, totalIncome: { english: 'Total Income', arabic: 'إجمالي الإيرادات' }, totalExpenses: { english: 'Total Expenses', arabic: 'إجمالي المصروفات' }, netProfit: { english: 'Net Profit', arabic: 'صافي الربح' },
         memberId: { english: 'ID', arabic: 'الرقم' }, fullName: { english: 'Full Name', arabic: 'الاسم الكامل' }, gender: { english: 'Gender', arabic: 'الجنس' }, contact: { english: 'Contact', arabic: 'التواصل' }, subscription: { english: 'Subscription', arabic: 'الاشتراك' }, status: { english: 'Status', arabic: 'الحالة' }, actions: { english: 'Actions', arabic: 'الإجراءات' },
         addMember: { english: 'Add Member', arabic: 'إضافة عضو' }, search: { english: 'Search...', arabic: 'بحث...' }, all: { english: 'All', arabic: 'الكل' }, male: { english: 'Male', arabic: 'ذكور' }, female: { english: 'Female', arabic: 'إناث' },
@@ -707,14 +713,19 @@
                 const endDate = member.subscriptionEndDate;
                 const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
                 if(daysLeft < 0) {
-                    status = "Expired"; statusClass = "danger";
+                    const daysAgo = Math.abs(daysLeft);
+                    status = translations.status_expired_with_days[currentLanguage].replace('{days}', daysAgo);
+                    statusClass = "danger";
                 } else if (daysLeft <= EXPIRATION_REMINDER_DAYS) {
-                    status = `Expiring (${daysLeft}d)`; statusClass = "warning";
+                    status = translations.status_expiring_with_days[currentLanguage].replace('{days}', daysLeft);
+                    statusClass = "warning";
                 } else {
-                    status = "Active"; statusClass = "success";
+                    status = translations.status_active_with_days[currentLanguage].replace('{days}', daysLeft);
+                    statusClass = "success";
                 }
             } else {
-                status = "None"; statusClass = "secondary";
+                status = translations.status_none[currentLanguage]; 
+                statusClass = "secondary";
             }
             const row = tbody.insertRow();
             row.innerHTML=`<td>${member.id}</td><td>${member.firstName} ${member.lastName}</td><td><i class="fas fa-${member.gender==="male"?"male text-primary":"female text-danger"} me-2"></i> ${member.gender}</td><td><div>${member.phone}</div><div class="small text-muted">${member.email||""}</div></td><td class="text-capitalize">${member.subscriptionType||"N/A"}</td><td><span class="badge bg-${statusClass}">${status}</span></td><td><div class="dropdown"><button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-translate="actions">${translations.actions[currentLanguage]}</button><ul class="dropdown-menu dropdown-menu-dark"><li><a class="dropdown-item" href="#" onclick="viewMember(${member.id})"><i class="fas fa-eye fa-fw me-2"></i><span data-translate="view">${translations.view[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="editMember(${member.id})"><i class="fas fa-edit fa-fw me-2"></i><span data-translate="edit">${translations.edit[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="addSubscriptionForMember(${member.id})"><i class="fas fa-sync fa-fw me-2"></i><span data-translate="renewSub">${translations.renewSub[currentLanguage]}</span></a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="#" onclick="deleteMember(${member.id})"><i class="fas fa-trash fa-fw me-2"></i><span data-translate="delete">${translations.delete[currentLanguage]}</span></a></li></ul></div></td>`;

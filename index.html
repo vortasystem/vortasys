@@ -328,12 +328,13 @@
     // --- NEW: API Configuration ---
     const API_URL = 'https://sheetdb.io/api/v1/5ua8j6rin3svf';
     const SHEETS = {
-        members: 'Members',
-        transactions: 'Transactions',
-        subTypes: 'SubscriptionTypes',
-        msgHistory: 'MessageHistory',
-        passwords: 'Passwords'
-    };
+    members: 'Members',
+    transactions: 'Transactions',
+    subTypes: 'SubscriptionTypes',
+    msgHistory: 'MessageHistory', // This is for logging
+    passwords: 'Passwords',
+    inbox: 'InboxMessages' // <-- NEW: Add this line
+};
 
     const EXPIRATION_REMINDER_DAYS = 10;
     
@@ -1155,37 +1156,85 @@
     function renderSubscriptionsReportTable(){const t=document.getElementById("subscriptions-report-table").querySelector("tbody");t.innerHTML="";const e=members.filter(t=>t.subscriptionActive);if(0===e.length)return void(t.innerHTML=`<tr><td colspan="5" class="text-center py-4" data-translate="noSubData">${translations.noSubData[currentLanguage]}</td></tr>`);const o=new Date;o.setHours(0,0,0,0),e.forEach(m=>{let r,n;const d=m.subscriptionEndDate,i=Math.ceil((d-o)/864e5);i<0?(r="Expired",n="danger"):i<=EXPIRATION_REMINDER_DAYS?(r="Expiring",n="warning"):(r="Active",n="success");const l=t.insertRow();l.innerHTML=`<td>${m.firstName} ${m.lastName}</td><td class="text-capitalize">${m.subscriptionType}</td><td>${m.subscriptionStartDate.toLocaleDateString()}</td><td>${d.toLocaleDateString()}</td><td><span class="badge bg-${n}">${r}</span></td>`})}
     function loadMessagingPage(){const t=document.getElementById("individual-member");t.innerHTML=`<option value="" disabled selected>${translations.selectPlaceholder[currentLanguage]}</option>`,members.sort((t,e)=>t.firstName.localeCompare(e.firstName)).forEach(e=>t.innerHTML+=`<option value="${e.id}">${e.firstName} ${e.lastName}</option>`),renderMessageHistory()}
     function renderMessageHistory(){const t=document.getElementById("message-history-table").querySelector("tbody");t.innerHTML="";if(0===messageHistory.length)return void(t.innerHTML=`<tr><td colspan="4" class="text-center py-4" data-translate="noMessages">${translations.noMessages[currentLanguage]}</td></tr>`);messageHistory.sort((t,e)=>e.sentAt-t.sentAt).forEach(e=>{const o=t.insertRow();o.innerHTML=`<td>${e.sentAt.toLocaleDateString()}</td><td>${e.recipients}</td><td class="text-truncate" style="max-width: 250px;">${e.message}</td><td><span class="badge bg-success">${e.status}</span></td>`})}
-    async function sendMessage() {
-        const recipientGroup = document.getElementById('message-recipients').value; const messageContent = document.getElementById('message-content').value.trim(); let recipientText = document.querySelector(`#message-recipients option[value="${recipientGroup}"]`).textContent; if (!messageContent) return alert(translations.alertEmptyMessage[currentLanguage]); let targetMembers = []; const today = new Date(); today.setHours(0, 0, 0, 0); const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
-        switch (recipientGroup) {
-            case 'all': targetMembers = [...members]; break;
-            case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
-            case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
-            case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
-            case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
-            case 'individual': const memberId = document.getElementById('individual-member').value; if (!memberId) return alert(translations.alertSelectIndividual[currentLanguage]); const member = members.find(m => m.id == memberId); if (member) { targetMembers.push(member); recipientText = `${member.firstName} ${member.lastName}`; } break;
-        }
-        const phoneNumbers = targetMembers.map(m => m.phone).filter(phone => phone); if (phoneNumbers.length === 0) return alert(translations.alertNoValidPhones[currentLanguage]);
-        
-        showSpinner("Sending message...");
-        const newMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
-        const result = await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({data: [newMessage]})
-        });
-        hideSpinner();
-
-        if (result) { 
-            messageHistory.push(parseMessageHistory([newMessage])[0]); 
-            alert(translations.alertMessageSentTo(recipientText)); 
-            document.getElementById('message-form').reset(); 
-            document.getElementById('individual-select-container').classList.add('d-none'); 
-            renderMessageHistory(); 
-        } else { 
-            alert(translations.alertSmsApiFailure[currentLanguage]); 
-        } 
+   // REPLACE the old sendMessage function with this new one
+async function sendMessage() {
+    const recipientGroup = document.getElementById('message-recipients').value;
+    const messageContent = document.getElementById('message-content').value.trim();
+    let recipientText = document.querySelector(`#message-recipients option[value="${recipientGroup}"]`).textContent;
+    
+    if (!messageContent) {
+        return alert(translations.alertEmptyMessage[currentLanguage]);
     }
+
+    let targetMembers = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eDate = new Date();
+    eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+
+    switch (recipientGroup) {
+        case 'all': targetMembers = [...members]; break;
+        case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
+        case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
+        case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
+        case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
+        case 'individual':
+            const memberId = document.getElementById('individual-member').value;
+            if (!memberId) return alert(translations.alertSelectIndividual[currentLanguage]);
+            const member = members.find(m => m.id == memberId);
+            if (member) {
+                targetMembers.push(member);
+                recipientText = `${member.firstName} ${member.lastName}`;
+            }
+            break;
+    }
+
+    if (targetMembers.length === 0) {
+        return alert(translations.alertNoValidPhones[currentLanguage]); // Re-using this alert, as it implies no members were found
+    }
+    
+    showSpinner(`Sending message to ${targetMembers.length} member(s)...`);
+
+    const messagesToSend = targetMembers.map(member => {
+        return {
+            messageId: Date.now() + Math.random(), // Add random to ensure uniqueness for batch sends
+            memberId: member.id,
+            senderName: "Vorta Fitness Admin",
+            messageContent: messageContent,
+            sentAt: new Date().toISOString(),
+            status: 'delivered'
+        };
+    });
+
+    const inboxPayload = { data: messagesToSend };
+
+    // Send to member inboxes
+    const result = await apiCall(`${API_URL}?sheet=${SHEETS.inbox}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(inboxPayload)
+    });
+
+    // Optional: Log the action in MessageHistory
+    const logMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
+    await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
+         method: 'POST',
+         headers: {'Content-Type': 'application/json'},
+         body: JSON.stringify({data: [logMessage]})
+    });
+    
+    hideSpinner();
+
+    if (result && result.created > 0) { 
+        messageHistory.push(parseMessageHistory([logMessage])[0]); 
+        alert(`Message successfully delivered to ${result.created} member(s).`); 
+        document.getElementById('message-form').reset(); 
+        document.getElementById('individual-select-container').classList.add('d-none'); 
+        renderMessageHistory(); 
+    } else { 
+        alert("Failed to send message. Check API logs."); 
+    } 
+}
 
     async function handleChangePassword() { 
         const form = document.getElementById('change-password-form'); 

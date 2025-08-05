@@ -213,6 +213,7 @@
                 <a href="#" class="list-group-item list-group-item-action active" data-tab="dashboard"><i class="fas fa-chart-pie fa-fw me-3"></i><span data-translate="dashboard">Dashboard</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="members"><i class="fas fa-users fa-fw me-3"></i><span data-translate="members">Members</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="financials"><i class="fas fa-wallet fa-fw me-3"></i><span data-translate="financials">Financials</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="debts"><i class="fas fa-file-invoice-dollar fa-fw me-3"></i><span data-translate="debts">Debts</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="subscriptions"><i class="fas fa-tags fa-fw me-3"></i><span data-translate="subscriptions">Subscriptions</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="messaging"><i class="fas fa-comments fa-fw me-3"></i><span data-translate="messaging">Messaging</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="reports"><i class="fas fa-chart-line fa-fw me-3"></i><span data-translate="reports">Reports</span></a>
@@ -234,13 +235,9 @@
                         <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="expiring"><div class="card-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></div><div class="card-details"><h6 class="card-title" data-translate="expiringSoon">Expiring Soon</h6><p class="card-value" id="expiring-subscriptions">0</p></div></div></div>
                         <div class="col-xl-3 col-md-6"><div class="stat-card clickable-card" data-filter="unsubscribed"><div class="card-icon bg-danger"><i class="fas fa-times-circle"></i></div><div class="card-details"><h6 class="card-title" data-translate="unsubscribed">Unsubscribed</h6><p class="card-value" id="unsubscribed-members">0</p></div></div></div>
                     </div>
-                     <!-- Financial Stats -->
-                    <h3 class="my-4" data-translate="financialSummary">Financial Summary</h3>
-                    <div class="row g-4">
-                        <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--success-color);"><i class="fas fa-arrow-up"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalIncome">Total Income</h6><p class="card-value" id="total-income">₪0</p></div></div></div>
-                        <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--danger-color);"><i class="fas fa-arrow-down"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalExpenses">Total Expenses</h6><p class="card-value" id="total-expenses">₪0</p></div></div></div>
-                        <div class="col-xl-4 col-md-12"><div class="stat-card"><div class="card-icon" style="background-color: var(--primary-color);"><i class="fas fa-balance-scale"></i></div><div class="card-details"><h6 class="card-title" data-translate="netProfit">Net Profit</h6><p class="card-value" id="net-profit">₪0</p></div></div></div>
-                    </div>
+                    
+                    <div id="dashboard-summary-placeholder"></div>
+
                     <!-- Charts -->
                     <div class="row g-4 mt-4">
                         <div class="col-lg-7"><div class="chart-container"><canvas id="subscriptionTypeChart"></canvas></div></div>
@@ -252,6 +249,15 @@
                 
                 <!-- FINANCIALS TAB -->
                 <div id="financials-tab" class="content-tab d-none">
+                    <div id="financial-summary-block">
+                        <h3 class="my-4" data-translate="financialSummary">Financial Summary</h3>
+                        <div class="row g-4 mb-4">
+                            <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--success-color);"><i class="fas fa-arrow-up"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalIncome">Total Income</h6><p class="card-value" id="total-income">₪0</p></div></div></div>
+                            <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--danger-color);"><i class="fas fa-arrow-down"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalExpenses">Total Expenses</h6><p class="card-value" id="total-expenses">₪0</p></div></div></div>
+                            <div class="col-xl-4 col-md-12"><div class="stat-card"><div class="card-icon" style="background-color: var(--primary-color);"><i class="fas fa-balance-scale"></i></div><div class="card-details"><h6 class="card-title" data-translate="netProfit">Net Profit</h6><p class="card-value" id="net-profit">₪0</p></div></div></div>
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                         <h2 class="mb-0" data-translate="financials">Financials</h2>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal" onclick="prepareAddTransactionModal()"><i class="fas fa-plus me-2"></i><span data-translate="addTransaction">Add Transaction</span></button>
@@ -270,6 +276,35 @@
                                    <tbody></tbody>
                                </table>
                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEBTS TAB -->
+                <div id="debts-tab" class="content-tab d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <h2 class="mb-0" data-translate="debtManagement">Debt Management</h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#debtModal" onclick="prepareDebtModal(null)">
+                            <i class="fas fa-plus me-2"></i><span data-translate="addDebt">Add Debt</span>
+                        </button>
+                    </div>
+                    <div class="card bg-surface">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="debts-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-translate="member">Member</th>
+                                            <th data-translate="description">Description</th>
+                                            <th class="text-end" data-translate="amount">Amount</th>
+                                            <th data-translate="date">Date</th>
+                                            <th data-translate="status">Status</th>
+                                            <th class="text-end" data-translate="actions">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -301,8 +336,52 @@
                 <div id="messaging-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="messaging">Messaging</h2><div class="row g-4"><div class="col-lg-5"><div class="card bg-surface h-100"><div class="card-body d-flex flex-column"><h5 class="card-title mb-4" data-translate="sendNewMessage">Send New Message</h5><form id="message-form"><div class="mb-3"><label for="message-recipients" class="form-label" data-translate="recipients">Recipients</label><select id="message-recipients" class="form-select" data-translate-options="recipientsOptions"></select></div><div class="mb-3 d-none" id="individual-select-container"><label for="individual-member" class="form-label" data-translate="selectMember">Select Member</label><select id="individual-member" class="form-select"></select></div><div class="mb-3"><label for="message-content" class="form-label" data-translate="message">Message</label><textarea id="message-content" class="form-control" rows="6" placeholder="Type your message..." data-translate="messagePlaceholder"></textarea></div><button type="submit" class="btn btn-primary w-100 mt-auto"><i class="fas fa-paper-plane me-2"></i><span data-translate="sendMessage">Send Message</span></button></form></div></div></div><div class="col-lg-7"><div class="card bg-surface h-100"><div class="card-body"><h5 class="card-title mb-4" data-translate="messageHistory">Message History</h5><div class="table-responsive" style="max-height: 500px;"><table class="table" id="message-history-table"><thead data-translate-headers="messageHistoryHeaders"><tr><th>Date</th><th>Recipients</th><th>Message</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div></div></div></div>
                 <!-- REPORTS TAB -->
                 <div id="reports-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="advancedReports">Advanced Reports</h2><div class="row g-4"><div class="col-12"><div class="card bg-surface"><div class="card-body"><h5 class="card-title" data-translate="memberGrowth">Member Growth</h5><p class="text-muted small" data-translate="memberGrowthDesc">Shows members joined each month.</p><div class="chart-container" style="height: 350px;"><canvas id="memberGrowthChart"></canvas></div></div></div></div><div class="col-12"><div class="card bg-surface"><div class="card-body"><h5 class="card-title" data-translate="subscriptionsReport">Subscriptions Report</h5><p class="text-muted small" data-translate="subscriptionsReportDesc">Detailed subscription data.</p><div class="table-responsive"><table class="table" id="subscriptions-report-table"><thead data-translate-headers="subscriptionsReportHeaders"><tr><th>Member Name</th><th>Sub. Type</th><th>Start Date</th><th>End Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div></div></div></div></div>
+                
                 <!-- SETTINGS TAB -->
-                <div id="settings-tab" class="content-tab d-none"><h2 class="mb-4" data-translate="settings">Settings</h2><div class="row g-4"><div class="col-md-6"><div class="card bg-surface h-100"><div class="card-body"><h5 class="card-title" data-translate="changePassword">Change Password</h5><p class="text-muted small" data-translate="changePasswordDesc">Update the system access password.</p><form id="change-password-form"><div class="mb-3"><label for="current-password" class="form-label" data-translate="currentPassword">Current Password</label><input type="password" id="current-password" class="form-control" required></div><div class="mb-3"><label for="new-password" class="form-label" data-translate="newPassword">New Password</label><input type="password" id="new-password" class="form-control" required></div><div class="mb-3"><label for="confirm-password" class="form-label" data-translate="confirmPassword">Confirm New Password</label><input type="password" id="confirm-password" class="form-control" required></div><button type="submit" class="btn btn-primary" data-translate="saveChanges">Save Changes</button></form></div></div></div><div class="col-md-6"><div class="card bg-surface h-100"><div class="card-body d-flex flex-column"><h5 class="card-title" data-translate="dataManagement">Data Management</h5><p class="text-muted small" data-translate="dataManagementDesc">Application-level actions.</p><div class="mt-auto"><button class="btn btn-danger" onclick="alert('This feature is disabled when connected to Google Sheets.')"><i class="fas fa-undo me-2"></i><span data-translate="resetData">Reset All Data</span></button><p class="mt-2 small text-danger">This feature is not recommended when using a live database.</p></div></div></div></div></div></div>
+                <div id="settings-tab" class="content-tab d-none">
+                    <h2 class="mb-4" data-translate="settings">Settings</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card bg-surface h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-translate="changePassword">Change Password</h5>
+                                    <p class="text-muted small" data-translate="changePasswordDesc">Update the system access password.</p>
+                                    <form id="change-password-form">
+                                        <div class="mb-3"><label for="current-password" class="form-label" data-translate="currentPassword">Current Password</label><input type="password" id="current-password" class="form-control" required></div>
+                                        <div class="mb-3"><label for="new-password" class="form-label" data-translate="newPassword">New Password</label><input type="password" id="new-password" class="form-control" required></div>
+                                        <div class="mb-3"><label for="confirm-password" class="form-label" data-translate="confirmPassword">Confirm New Password</label><input type="password" id="confirm-password" class="form-control" required></div>
+                                        <button type="submit" class="btn btn-primary" data-translate="saveChanges">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-surface h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title" data-translate="dataManagement">Data Management</h5>
+                                    <p class="text-muted small" data-translate="dataManagementDesc">Application-level actions.</p>
+                                    <div class="mt-auto">
+                                        <button class="btn btn-danger" onclick="alert('This feature is disabled when connected to Google Sheets.')"><i class="fas fa-undo me-2"></i><span data-translate="resetData">Reset All Data</span></button>
+                                        <p class="mt-2 small text-danger">This feature is not recommended when using a live database.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-4">
+                            <div class="card bg-surface h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-translate="uiSettings">UI Settings</h5>
+                                    <p class="text-muted small" data-translate="dashboardSettingsDesc">Customize dashboard visibility.</p>
+                                    <div class="form-check form-switch mt-3">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="show-summary-toggle">
+                                        <label class="form-check-label" for="show-summary-toggle" data-translate="showFinancialSummaryOnDashboard">Show Financial Summary on Dashboard</label>
+                                    </div>
+                                    <p class="small text-muted mt-2" data-translate="requiresFinancialsPassword">Changing this setting requires the financials password.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -315,44 +394,93 @@
     <div class="modal fade" id="subscriptionTypeModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="subscriptionTypeModalLabel" data-translate="addSubType">Add Subscription Type</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="subscription-type-form"><input type="hidden" id="sub-type-id"><div class="mb-3"><label for="sub-type-name-en" class="form-label">Name (English)</label><input type="text" class="form-control" id="sub-type-name-en" required></div><div class="mb-3"><label for="sub-type-name-ar" class="form-label">Name (Arabic)</label><input type="text" class="form-control" id="sub-type-name-ar" dir="rtl" required></div><div class="mb-3"><label for="sub-type-duration" class="form-label" data-translate="durationInDays">Duration (Days)</label><input type="number" class="form-control" id="sub-type-duration" required min="1"></div><div class="mb-3"><label for="sub-type-price" class="form-label" data-translate="price">Price</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="sub-type-price" required min="0"></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="subscription-type-form" class="btn btn-primary" data-translate="save">Save</button></div></div></div></div>
     <div class="modal fade" id="addTransactionModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="transactionModalLabel" data-translate="addTransaction">Add Transaction</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><form id="add-transaction-form"><input type="hidden" id="transaction-id"><div class="mb-3"><label for="transaction-type" class="form-label" data-translate="type">Type</label><select id="transaction-type" class="form-select" data-translate-options="transactionTypeOptions"></select></div><div class="mb-3"><label for="transaction-description" class="form-label" data-translate="description">Description</label><input type="text" class="form-control" id="transaction-description" required></div><div class="mb-3"><label for="transaction-amount" class="form-label" data-translate="amount">Amount</label><div class="input-group"><span class="input-group-text">₪</span><input type="number" class="form-control" id="transaction-amount" required min="0" step="0.01"></div></div></form></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button><button type="submit" form="add-transaction-form" class="btn btn-primary" data-translate="save">Save</button></div></div></div></div>
 
+    <!-- DEBT MODAL -->
+    <div class="modal fade" id="debtModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="debtModalLabel" data-translate="addDebt">Add Debt</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="debt-form">
+                        <input type="hidden" id="debt-id">
+                        <div class="mb-3">
+                            <label for="debt-member" class="form-label" data-translate="member">Member</label>
+                            <select id="debt-member" class="form-select" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="debt-description" class="form-label" data-translate="description">Description</label>
+                            <input type="text" class="form-control" id="debt-description" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="debt-amount" class="form-label" data-translate="amount">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₪</span>
+                                <input type="number" class="form-control" id="debt-amount" required min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="debt-date" class="form-label" data-translate="date">Date</label>
+                            <input type="date" class="form-control" id="debt-date" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">Cancel</button>
+                    <button type="submit" form="debt-form" class="btn btn-primary" data-translate="save">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
     // =================================================================================
     // Vorta Fitness - Club Management System
-    // Version: 9.1 (Bootstrap Modal Instance Fix)
+    // Version: 9.7 (Settings Password Protection)
     // =================================================================================
     'use strict';
     
-    // --- NEW: API Configuration ---
     const API_URL = 'https://sheetdb.io/api/v1/5ua8j6rin3svf';
     const SHEETS = {
-    members: 'Members',
-    transactions: 'Transactions',
-    subTypes: 'SubscriptionTypes',
-    msgHistory: 'MessageHistory', // This is for logging
-    passwords: 'Passwords',
-    inbox: 'InboxMessages' // <-- NEW: Add this line
-};
+        members: 'Members',
+        transactions: 'Transactions',
+        subTypes: 'SubscriptionTypes',
+        msgHistory: 'MessageHistory',
+        passwords: 'Passwords',
+        inbox: 'InboxMessages',
+        debts: 'Debts' // New sheet for debts
+    };
 
     const EXPIRATION_REMINDER_DAYS = 10;
     
     let currentTab = 'dashboard', currentLanguage = localStorage.getItem('vortaFitnessLanguage') || 'english';
-    let members = [], messageHistory = [], subscriptionTypes = [], transactions = [], passwords = []; 
+    let members = [], messageHistory = [], subscriptionTypes = [], transactions = [], passwords = [], debts = []; // New array for debts
     let genderChart, subscriptionChart, memberGrowthChart = null;
     let dashboardFilter = null; 
 
-    // --- TRANSLATIONS (Unchanged) ---
     const translations = {
         dashboard: { english: 'Dashboard', arabic: 'لوحة التحكم' }, members: { english: 'Members', arabic: 'الأعضاء' }, financials: { english: 'Financials', arabic: 'المالية' }, subscriptions: { english: 'Subscriptions', arabic: 'الاشتراكات' }, messaging: { english: 'Messaging', arabic: 'الرسائل' }, reports: { english: 'Reports', arabic: 'التقارير' }, settings: { english: 'Settings', arabic: 'الإعدادات' },
+        debts: { english: 'Debts', arabic: 'الديون' },
+        debtManagement: { english: 'Debt Management', arabic: 'إدارة الديون' },
+        addDebt: { english: 'Add Debt', arabic: 'إضافة دين' },
+        editDebt: { english: 'Edit Debt', arabic: 'تعديل دين' },
+        statusPaid: { english: 'Paid', arabic: 'مدفوع' },
+        statusUnpaid: { english: 'Unpaid', arabic: 'غير مدفوع' },
+        markAsPaid: { english: 'Mark as Paid', arabic: 'تحديد كـ مدفوع' },
+        noDebts: { english: 'No outstanding debts found.', arabic: 'لا توجد ديون مسجلة.' },
+        alertDebtAdded: { english: 'Debt added successfully.', arabic: 'تمت إضافة الدين بنجاح.' },
+        alertDebtUpdated: { english: 'Debt updated successfully.', arabic: 'تم تحديث الدين بنجاح.' },
+        alertConfirmDeleteDebt: { english: 'Are you sure you want to delete this debt record?', arabic: 'هل أنت متأكد من حذف سجل الدين هذا؟' },
+        alertDebtPaid: { english: 'Debt marked as paid and transaction created.', arabic: 'تم تحديد الدين كمدفوع وإنشاء معاملة مالية.' },
         totalMembers: { english: 'Total Members', arabic: 'إجمالي الأعضاء' }, activeSubscriptions: { english: 'Active Subscriptions', arabic: 'الاشتراكات النشطة' }, expiringSoon: { english: 'Expiring Soon', arabic: 'تنتهي قريباً' }, unsubscribed: { english: 'Unsubscribed', arabic: 'غير مشتركين' },
-        // NEW TRANSLATIONS FOR MEMBER STATUS
         status_active_with_days: { english: 'Active ({days} days left)', arabic: 'نشط ({days} أيام متبقية)' },
         status_expiring_with_days: { english: 'Expiring ({days} days left)', arabic: 'سينتهي قريباً ({days} أيام متبقية)' },
         status_expired_with_days: { english: 'Expired ({days} days ago)', arabic: 'منتهي (قبل {days} يوم)' },
         status_none: { english: 'None', arabic: 'لا يوجد' },
-
         financialSummary: { english: 'Financial Summary', arabic: 'الملخص المالي' }, totalIncome: { english: 'Total Income', arabic: 'إجمالي الإيرادات' }, totalExpenses: { english: 'Total Expenses', arabic: 'إجمالي المصروفات' }, netProfit: { english: 'Net Profit', arabic: 'صافي الربح' },
         memberId: { english: 'ID', arabic: 'الرقم' }, fullName: { english: 'Full Name', arabic: 'الاسم الكامل' }, gender: { english: 'Gender', arabic: 'الجنس' }, contact: { english: 'Contact', arabic: 'التواصل' }, subscription: { english: 'Subscription', arabic: 'الاشتراك' }, status: { english: 'Status', arabic: 'الحالة' }, actions: { english: 'Actions', arabic: 'الإجراءات' },
         addMember: { english: 'Add Member', arabic: 'إضافة عضو' }, search: { english: 'Search...', arabic: 'بحث...' }, all: { english: 'All', arabic: 'الكل' }, male: { english: 'Male', arabic: 'ذكور' }, female: { english: 'Female', arabic: 'إناث' },
@@ -363,7 +491,6 @@
         changePassword: { english: 'Change Password', arabic: 'تغيير كلمة المرور'}, changePasswordDesc: { english: 'Update the system access password.', arabic: 'تحديث كلمة مرور الدخول للنظام.'},
         currentPassword: { english: 'Current Password', arabic: 'كلمة المرور الحالية'}, newPassword: { english: 'New Password', arabic: 'كلمة المرور الجديدة'}, confirmPassword: { english: 'Confirm New Password', arabic: 'تأكيد كلمة المرور الجديدة'},
         dataManagement: { english: 'Data Management', arabic: 'إدارة البيانات' }, dataManagementDesc: { english: 'Application-level actions.', arabic: 'إجراءات على مستوى التطبيق.' }, resetData: { english: 'Reset All Data', arabic: 'إعادة تعيين البيانات' }, resetDataWarning: { english: "Warning: This action is permanent and will require a page reload.", arabic: "تحذير: هذا الإجراء دائم وسيتطلب إعادة تحميل الصفحة." },
-        downloadData: { english: 'Download Data', arabic: 'تنزيل البيانات' }, importData: { english: 'Import Data', arabic: 'استيراد البيانات' },
         addMemberTitle: { english: 'Add New Member', arabic: 'إضافة عضو جديد' }, editMemberTitle: { english: 'Edit Member', arabic: 'تعديل بيانات عضو' },
         firstName: { english: 'First Name', arabic: 'الاسم الأول' }, lastName: { english: 'Last Name', arabic: 'اسم العائلة' }, phone: { english: 'Phone', arabic: 'الهاتف' }, email: { english: 'Email', arabic: 'البريد الإلكتروني' }, emailOptional: { english: 'Email (Optional)', arabic: 'البريد (اختياري)'},
         prefLanguage: { english: 'Preferred Language', arabic: 'اللغة المفضلة' }, addRenewSubTitle: { english: 'Add/Renew Subscription', arabic: 'إضافة/تجديد اشتراك' }, subType: { english: 'Type', arabic: 'النوع' },
@@ -401,7 +528,14 @@
         alertNoValidPhones: { english: 'No members with valid phone numbers in the selected group.', arabic: 'لا يوجد أعضاء بأرقام هواتف صالحة في المجموعة المحددة.'},
         alertPasswordMismatch: { english: 'New passwords do not match.', arabic: 'كلمتا المرور الجديدتان غير متطابقتين.'},
         alertPasswordEmpty: { english: 'New password cannot be empty.', arabic: 'كلمة المرور الجديدة لا يمكن أن تكون فارغة.'},
-        alertPasswordChanged: { english: 'Password changed successfully.', arabic: 'تم تغيير كلمة المرور بنجاح.'}
+        alertPasswordChanged: { english: 'Password changed successfully.', arabic: 'تم تغيير كلمة المرور بنجاح.'},
+        uiSettings: { english: 'UI Settings', arabic: 'إعدادات الواجهة' },
+        dashboardSettingsDesc: { english: 'Customize dashboard visibility.', arabic: 'تخصيص عرض لوحة التحكم.' },
+        showFinancialSummaryOnDashboard: { english: 'Show Financial Summary on Dashboard', arabic: 'إظهار الملخص المالي في لوحة التحكم' },
+        requiresFinancialsPassword: { english: 'Changing this setting requires the financials password.', arabic: 'تغيير هذا الإعداد يتطلب كلمة مرور المالية.' },
+        alertMemberExists: { english: "A member with this phone number already exists. Please select a subscription to renew.", arabic: "عضو بهذا الرقم مسجل بالفعل. الرجاء اختيار اشتراك لتجديده." },
+        alertConfirmRenewal: (name) => ({ english: `A member with this phone number already exists: ${name}. Do you want to renew their subscription?`, arabic: `عضو بهذا الرقم مسجل بالفعل: ${name}. هل تريد تجديد اشتراكه؟` }[currentLanguage]),
+        alertRenewalSuccess: { english: "Subscription renewed successfully.", arabic: "تم تجديد الاشتراك بنجاح." }
     };
 
     function showSpinner(text = 'Loading...') {
@@ -482,20 +616,24 @@
                 membersData, 
                 transactionsData, 
                 subscriptionTypesData, 
-                messageHistoryData
+                messageHistoryData,
+                debtsData
             ] = await Promise.all([
                 apiCall(`${API_URL}?sheet=${SHEETS.members}`),
                 apiCall(`${API_URL}?sheet=${SHEETS.transactions}`),
                 apiCall(`${API_URL}?sheet=${SHEETS.subTypes}`),
-                apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`)
+                apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`),
+                apiCall(`${API_URL}?sheet=${SHEETS.debts}`)
             ]);
 
             members = parseMembers(membersData || []);
             transactions = parseTransactions(transactionsData || []);
             subscriptionTypes = parseSubscriptionTypes(subscriptionTypesData || []);
             messageHistory = parseMessageHistory(messageHistoryData || []);
+            debts = parseDebts(debtsData || []);
             
             setupEventListeners(); 
+            positionFinancialSummary(); 
             showTab('dashboard'); 
             console.log("Vorta Fitness is Ready.");
         } catch (error) {
@@ -528,6 +666,17 @@
             memberId: t.memberId ? parseInt(t.memberId, 10) : null
         }));
     }
+    
+    function parseDebts(data) {
+        return data.map(d => ({
+            ...d,
+            id: parseInt(d.id, 10),
+            memberId: parseInt(d.memberId, 10),
+            amount: parseFloat(d.amount),
+            date: d.date ? new Date(d.date) : new Date(),
+            isPaid: d.isPaid === 'TRUE'
+        }));
+    }
 
     function parseSubscriptionTypes(data) {
         return data.map(st => ({
@@ -548,7 +697,7 @@
     function setupEventListeners() {
         document.querySelector('.main-sidebar').addEventListener('click', handleNavClick);
         document.querySelector('.btn-group-lang').addEventListener('click', (e) => e.target.closest('[data-lang]') && setLanguage(e.target.dataset.lang));
-        ['add-member-form', 'edit-member-form', 'subscription-form', 'change-password-form', 'subscription-type-form', 'add-transaction-form'].forEach(id => {
+        ['add-member-form', 'edit-member-form', 'subscription-form', 'change-password-form', 'subscription-type-form', 'add-transaction-form', 'debt-form'].forEach(id => {
             document.getElementById(id)?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 switch (id) {
@@ -558,6 +707,7 @@
                     case 'change-password-form': await handleChangePassword(); break;
                     case 'subscription-type-form': await saveSubscriptionType(); break;
                     case 'add-transaction-form': await saveTransaction(); break;
+                    case 'debt-form': await saveDebt(); break;
                 }
             });
         });
@@ -587,6 +737,8 @@
         });
         document.getElementById('addMemberModal').addEventListener('show.bs.modal', populateAddMemberModal);
         document.getElementById('subscriptionModal').addEventListener('show.bs.modal', populateSubscriptionModal);
+
+        document.getElementById('show-summary-toggle').addEventListener('change', handleToggleSummary);
     }
     
     function formatCurrency(amount) {
@@ -602,12 +754,15 @@
     }
 
     async function showTab(tabName) {
-        if (tabName === 'financials') {
-            const enteredPassword = prompt("الرجاء إدخال كلمة المرور للوصول إلى صفحة المالية:");
+        // START OF MODIFICATION: Added 'settings' to the protected tabs
+        const protectedTabs = ['financials', 'debts', 'settings'];
+        if (protectedTabs.includes(tabName)) {
+        // END OF MODIFICATION
+            const enteredPassword = prompt(translations.requiresFinancialsPassword[currentLanguage]);
             const correctPassword = getFinancialsPassword();
 
             if (enteredPassword !== correctPassword) {
-                alert("كلمة مرور غير صحيحة. تم رفض الوصول.");
+                alert(translations.alertIncorrectPassword[currentLanguage]);
                 return;
             }
         }
@@ -616,7 +771,7 @@
         document.querySelectorAll('.content-tab').forEach(tab => tab.classList.add('d-none'));
         document.getElementById(tabName + '-tab').classList.remove('d-none');
         document.querySelectorAll('.main-sidebar [data-tab]').forEach(link => link.classList.toggle('active', link.dataset.tab === tabName));
-        const tabActions = { dashboard: refreshDashboard, members: loadMembers, financials: loadFinancialsPage, subscriptions: loadSubscriptionsPage, messaging: loadMessagingPage, reports: loadReportsPage, settings: () => {} };
+        const tabActions = { dashboard: refreshDashboard, members: loadMembers, financials: loadFinancialsPage, debts: loadDebtsPage, subscriptions: loadSubscriptionsPage, messaging: loadMessagingPage, reports: loadReportsPage, settings: loadSettingsPage };
         tabActions[tabName]?.();
     }
 
@@ -634,28 +789,37 @@
         else { refreshAllDynamicContent(); }
     }
 
+    function updateFinancialSummaryCards() {
+        const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const netProfit = totalIncome - totalExpenses;
+        
+        document.getElementById("total-income").textContent = formatCurrency(totalIncome);
+        document.getElementById("total-expenses").textContent = formatCurrency(totalExpenses);
+        document.getElementById("net-profit").textContent = formatCurrency(netProfit);
+    }
+
     function refreshDashboard() { 
-        const activeMembers = members.filter(m => m.subscriptionActive);
+        const today = new Date(); 
+        today.setHours(0,0,0,0);
+        
+        const allActiveMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate);
+        const activeNow = allActiveMembers.filter(m => m.subscriptionEndDate >= today);
+
         const total = members.length;
-        const active = activeMembers.length;
+        const active = activeNow.length;
         const unsubscribed = total - active;
         
-        const today = new Date(); today.setHours(0,0,0,0);
-        const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
-        const expiring = activeMembers.filter(m => m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate).length;
+        const eDate = new Date(); 
+        eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+        const expiring = activeNow.filter(m => m.subscriptionEndDate <= eDate).length;
         
         document.getElementById("total-members").textContent = total;
         document.getElementById("active-subscriptions").textContent = active;
         document.getElementById("expiring-subscriptions").textContent = expiring;
         document.getElementById("unsubscribed-members").textContent = unsubscribed;
         
-        const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-        const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-        const netProfit = totalIncome - totalExpenses;
-        document.getElementById("total-income").textContent = formatCurrency(totalIncome);
-        document.getElementById("total-expenses").textContent = formatCurrency(totalExpenses);
-        document.getElementById("net-profit").textContent = formatCurrency(netProfit);
-        
+        updateFinancialSummaryCards(); 
         renderDashboardCharts();
     }
     
@@ -681,22 +845,36 @@
     
     function loadMembers() {
         let filteredMembers = [...members]; 
+
         if (dashboardFilter) {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
-            const eDate = new Date(); eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const eDate = new Date();
+            eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+
             switch (dashboardFilter) {
-                case 'active': filteredMembers = filteredMembers.filter(m => m.subscriptionActive); break;
-                case 'expiring': filteredMembers = filteredMembers.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
-                case 'unsubscribed': filteredMembers = filteredMembers.filter(m => !m.subscriptionActive); break;
+                case 'active':
+                    filteredMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today);
+                    break;
+                case 'expiring':
+                    filteredMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate);
+                    break;
+                case 'unsubscribed':
+                    filteredMembers = members.filter(m => !m.subscriptionActive || (m.subscriptionEndDate && m.subscriptionEndDate < today));
+                    break;
             }
             dashboardFilter = null;
         }
+
         const activeGender = document.querySelector("#members-tab .btn-group button.active").dataset.gender;
         if (activeGender !== 'all') { filteredMembers = filteredMembers.filter(m => m.gender === activeGender); }
+        
         const searchTerm = document.getElementById("member-search").value.toLowerCase();
         if (searchTerm) { filteredMembers = filteredMembers.filter(m => `${m.firstName} ${m.lastName}`.toLowerCase().includes(searchTerm) || m.phone.includes(searchTerm) || m.email?.toLowerCase().includes(searchTerm)); }
+        
         renderMembersTable(filteredMembers);
     }
+    
     function filterMembersByGender(gender){document.querySelectorAll("#members-tab .btn-group button").forEach(e=>e.classList.toggle("active",e.dataset.gender===gender));loadMembers()}
     function filterMembersTable(){loadMembers()}
     
@@ -710,7 +888,7 @@
         const today = new Date(); today.setHours(0,0,0,0);
         data.forEach(member => {
             let status, statusClass;
-            if(member.subscriptionActive) {
+            if(member.subscriptionActive && member.subscriptionEndDate) {
                 const endDate = member.subscriptionEndDate;
                 const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
                 if(daysLeft < 0) {
@@ -738,79 +916,143 @@
         const firstName = form.querySelector("#add-first-name").value.trim();
         const lastName = form.querySelector("#add-last-name").value.trim();
         const phone = form.querySelector("#add-phone").value.trim();
-        if(!firstName || !lastName || !phone) return alert(translations.formValidation[currentLanguage]);
 
-        const newId = members.length > 0 ? Math.max(...members.map(t => t.id)) + 1 : 1;
-        
-        const newMemberData = {
-            id: newId,
-            firstName: firstName,
-            lastName: lastName,
-            gender: form.querySelector("#add-gender").value,
-            phone: phone,
-            email: form.querySelector("#add-email").value.trim(),
-            language: form.querySelector("#add-language").value,
-            createdAt: new Date().toISOString()
-        };
-
-        const subTypeId = form.querySelector("#add-member-subscription-type").value;
-        let newTransactionData = null;
-
-        if (subTypeId) {
-            const subType = subscriptionTypes.find(st => st.id == subTypeId);
-            if (subType) {
-                const startDate = new Date();
-                const endDate = new Date(startDate);
-                endDate.setDate(startDate.getDate() + subType.durationDays);
-                
-                Object.assign(newMemberData, {
-                    subscriptionId: Date.now(),
-                    subscriptionType: subType.name_english,
-                    subscriptionPrice: subType.price,
-                    subscriptionStartDate: startDate.toISOString(),
-                    subscriptionEndDate: endDate.toISOString(),
-                    subscriptionActive: 'TRUE'
-                });
-
-                newTransactionData = {
-                    id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
-                    date: new Date().toISOString(),
-                    description: `Subscription: ${newMemberData.firstName} ${newMemberData.lastName}`,
-                    type: 'income',
-                    amount: subType.price,
-                    memberId: newMemberData.id
-                };
-            }
+        if(!firstName || !lastName || !phone) {
+            alert(translations.formValidation[currentLanguage]);
+            return;
         }
 
-        showSpinner("Adding member...");
-        
-        const memberPayload = { data: [newMemberData] };
-        const memberResult = await apiCall(`${API_URL}?sheet=${SHEETS.members}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(memberPayload)
-        });
+        const existingMember = members.find(m => m.phone === phone);
+        const subTypeId = form.querySelector("#add-member-subscription-type").value;
 
-        if (memberResult && newTransactionData) {
-            const transactionPayload = { data: [newTransactionData] };
-            await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+        if (existingMember) {
+            if (!subTypeId) {
+                alert(translations.alertMemberExists[currentLanguage]);
+                return;
+            }
+
+            const fullName = `${existingMember.firstName} ${existingMember.lastName}`;
+            if (!confirm(translations.alertConfirmRenewal(fullName))) {
+                return; 
+            }
+
+            const subType = subscriptionTypes.find(st => st.id == subTypeId);
+            if (!subType) return;
+
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + subType.durationDays);
+
+            const memberUpdateData = {
+                subscriptionId: Date.now(),
+                subscriptionType: subType.name_english,
+                subscriptionPrice: subType.price,
+                subscriptionStartDate: startDate.toISOString(),
+                subscriptionEndDate: endDate.toISOString(),
+                subscriptionActive: 'TRUE'
+            };
+
+            const newTransactionData = {
+                id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
+                date: new Date().toISOString(),
+                description: `Subscription Renewal: ${fullName}`,
+                type: 'income',
+                amount: subType.price,
+                memberId: existingMember.id
+            };
+
+            showSpinner("Renewing subscription...");
+            const [memberResult, transactionResult] = await Promise.all([
+                apiCall(`${API_URL}/id/${existingMember.id}?sheet=${SHEETS.members}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: memberUpdateData })
+                }),
+                apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [newTransactionData] })
+                })
+            ]);
+            hideSpinner();
+
+            if (memberResult && transactionResult) {
+                const memberIndex = members.findIndex(m => m.id === existingMember.id);
+                if (memberIndex !== -1) {
+                     Object.assign(members[memberIndex], parseMembers([memberUpdateData])[0]);
+                }
+                transactions.push(parseTransactions([newTransactionData])[0]);
+                
+                const modal = form.closest('.modal');
+                bootstrap.Modal.getInstance(modal).hide();
+                form.reset();
+                alert(translations.alertRenewalSuccess[currentLanguage]);
+                refreshAllDynamicContent();
+            }
+        } 
+        else {
+            const newId = members.length > 0 ? Math.max(...members.map(t => t.id)) + 1 : 1;
+            const newMemberData = {
+                id: newId, firstName, lastName, phone,
+                gender: form.querySelector("#add-gender").value,
+                email: form.querySelector("#add-email").value.trim(),
+                language: form.querySelector("#add-language").value,
+                createdAt: new Date().toISOString()
+            };
+            let newTransactionData = null;
+
+            if (subTypeId) {
+                const subType = subscriptionTypes.find(st => st.id == subTypeId);
+                if (subType) {
+                    const startDate = new Date();
+                    const endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + subType.durationDays);
+                    
+                    Object.assign(newMemberData, {
+                        subscriptionId: Date.now(),
+                        subscriptionType: subType.name_english,
+                        subscriptionPrice: subType.price,
+                        subscriptionStartDate: startDate.toISOString(),
+                        subscriptionEndDate: endDate.toISOString(),
+                        subscriptionActive: 'TRUE'
+                    });
+
+                    newTransactionData = {
+                        id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
+                        date: new Date().toISOString(),
+                        description: `New Subscription: ${newMemberData.firstName} ${newMemberData.lastName}`,
+                        type: 'income',
+                        amount: subType.price,
+                        memberId: newMemberData.id
+                    };
+                }
+            }
+
+            showSpinner("Adding member...");
+            const memberResult = await apiCall(`${API_URL}?sheet=${SHEETS.members}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(transactionPayload)
+                body: JSON.stringify({ data: [newMemberData] })
             });
-            transactions.push(parseTransactions([newTransactionData])[0]);
-        }
-        
-        hideSpinner();
 
-        if (memberResult) {
-            members.push(parseMembers([newMemberData])[0]);
-            const modal = form.closest('.modal');
-            bootstrap.Modal.getInstance(modal).hide();
-            form.reset();
-            alert(translations.alertMemberAdded[currentLanguage]);
-            refreshAllDynamicContent();
+            if (memberResult && newTransactionData) {
+                await apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: [newTransactionData] })
+                });
+                transactions.push(parseTransactions([newTransactionData])[0]);
+            }
+            hideSpinner();
+
+            if (memberResult) {
+                members.push(parseMembers([newMemberData])[0]);
+                const modal = form.closest('.modal');
+                bootstrap.Modal.getInstance(modal).hide();
+                form.reset();
+                alert(translations.alertMemberAdded[currentLanguage]);
+                refreshAllDynamicContent();
+            }
         }
     }
 
@@ -826,7 +1068,7 @@
         form.querySelector("#edit-gender").value=member.gender;
         form.querySelector("#edit-language").value=member.language;
         const modalEl = form.closest(".modal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveMemberChanges(){
@@ -888,7 +1130,7 @@
         }
         document.getElementById("viewMemberModalBody").innerHTML=`<h6>${e.firstName} ${e.lastName} <span class="badge bg-secondary">ID:${e.id}</span></h6><hr><p><strong>${translations.phone[currentLanguage]}:</strong> ${e.phone}</p>${subDetails}`;
         const modalEl = document.getElementById("viewMemberModal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     function addSubscriptionForMember(id){
@@ -899,7 +1141,7 @@
         form.querySelector("#subscription-member-name").textContent=`${e.firstName} ${e.lastName}`;
         form.querySelector("#subscription-start-date").valueAsDate=new Date;
         const modalEl = form.closest(".modal");
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveSubscription(){
@@ -963,6 +1205,7 @@
     }
 
     function loadFinancialsPage() {
+        updateFinancialSummaryCards(); 
         const tbody = document.getElementById("financials-table").querySelector("tbody");
         tbody.innerHTML = "";
         if (transactions.length === 0) {
@@ -988,7 +1231,7 @@
         form.querySelector('#transaction-id').value = transaction.id; form.querySelector('#transaction-type').value = transaction.type;
         form.querySelector('#transaction-description').value = transaction.description; form.querySelector('#transaction-amount').value = transaction.amount;
         const modalEl = document.getElementById('addTransactionModal');
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveTransaction() {
@@ -1044,6 +1287,182 @@
         }
     }
 
+    function loadDebtsPage() {
+        const tbody = document.getElementById("debts-table").querySelector("tbody");
+        tbody.innerHTML = "";
+        if (debts.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4" data-translate="noDebts">${translations.noDebts[currentLanguage]}</td></tr>`;
+            return;
+        }
+
+        const sortedDebts = [...debts].sort((a, b) => {
+            if (a.isPaid !== b.isPaid) {
+                return a.isPaid ? 1 : -1; 
+            }
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        sortedDebts.forEach(debt => {
+            const member = members.find(m => m.id === debt.memberId);
+            const memberName = member ? `${member.firstName} ${member.lastName}` : `Member ID: ${debt.memberId}`;
+            const statusText = debt.isPaid ? translations.statusPaid[currentLanguage] : translations.statusUnpaid[currentLanguage];
+            const statusClass = debt.isPaid ? 'success' : 'danger';
+            const row = tbody.insertRow();
+            row.className = debt.isPaid ? 'text-muted' : '';
+
+            let actions = `
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="prepareDebtModal(${debt.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteDebt(${debt.id})"><i class="fas fa-trash"></i></button>
+            `;
+
+            if (!debt.isPaid) {
+                actions = `
+                    <button class="btn btn-sm btn-outline-success me-2" title="${translations.markAsPaid[currentLanguage]}" onclick="markDebtAsPaid(${debt.id})"><i class="fas fa-check"></i></button>
+                ` + actions;
+            }
+
+            row.innerHTML = `
+                <td>${memberName}</td>
+                <td>${debt.description}</td>
+                <td class="text-end fw-bold">${formatCurrency(debt.amount)}</td>
+                <td>${new Date(debt.date).toLocaleDateString()}</td>
+                <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+                <td class="text-end">${actions}</td>
+            `;
+        });
+    }
+
+    function prepareDebtModal(id) {
+        const form = document.getElementById('debt-form');
+        form.reset();
+        const modalLabel = document.getElementById('debtModalLabel');
+        const memberSelect = document.getElementById('debt-member');
+
+        memberSelect.innerHTML = `<option value="" disabled selected>-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
+        members.sort((a,b) => a.firstName.localeCompare(b.firstName)).forEach(m => {
+            memberSelect.innerHTML += `<option value="${m.id}">${m.firstName} ${m.lastName}</option>`;
+        });
+
+        if (id) {
+            const debt = debts.find(d => d.id === id);
+            if (debt) {
+                modalLabel.textContent = translations.editDebt[currentLanguage];
+                form.querySelector('#debt-id').value = debt.id;
+                memberSelect.value = debt.memberId;
+                memberSelect.disabled = true;
+                form.querySelector('#debt-description').value = debt.description;
+                form.querySelector('#debt-amount').value = debt.amount;
+                form.querySelector('#debt-date').valueAsDate = new Date(debt.date);
+            }
+        } else {
+            modalLabel.textContent = translations.addDebt[currentLanguage];
+            form.querySelector('#debt-id').value = '';
+            memberSelect.disabled = false;
+            form.querySelector('#debt-date').valueAsDate = new Date();
+        }
+    }
+
+    async function saveDebt() {
+        const form = document.getElementById('debt-form');
+        const id = form.querySelector('#debt-id').value;
+        const memberId = parseInt(form.querySelector('#debt-member').value);
+        const description = form.querySelector('#debt-description').value.trim();
+        const amount = parseFloat(form.querySelector('#debt-amount').value);
+        const date = form.querySelector('#debt-date').value;
+
+        if (!memberId || !description || isNaN(amount) || amount <= 0 || !date) {
+            return alert(translations.formValidation[currentLanguage]);
+        }
+
+        showSpinner("Saving debt...");
+        if (id) {
+            const debtData = { description, amount, date: new Date(date).toISOString() };
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.debts}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: debtData })
+            });
+            if (result) {
+                const index = debts.findIndex(d => d.id == id);
+                if (index > -1) { Object.assign(debts[index], parseDebts([debtData])[0]); }
+                alert(translations.alertDebtUpdated[currentLanguage]);
+            }
+        } else {
+            const newId = debts.length > 0 ? Math.max(...debts.map(d => d.id)) + 1 : 1;
+            const debtData = { id: newId, memberId, description, amount, date: new Date(date).toISOString(), isPaid: 'FALSE' };
+            const result = await apiCall(`${API_URL}?sheet=${SHEETS.debts}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: [debtData] })
+            });
+            if (result) {
+                debts.push(parseDebts([debtData])[0]);
+                alert(translations.alertDebtAdded[currentLanguage]);
+            }
+        }
+        hideSpinner();
+        const modal = form.closest('.modal');
+        bootstrap.Modal.getInstance(modal).hide();
+        loadDebtsPage();
+    }
+
+    async function deleteDebt(id) {
+        if (confirm(translations.alertConfirmDeleteDebt[currentLanguage])) {
+            showSpinner("Deleting...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.debts}`, { method: 'DELETE' });
+            hideSpinner();
+            if (result) {
+                debts = debts.filter(d => d.id !== id);
+                loadDebtsPage();
+            }
+        }
+    }
+
+    async function markDebtAsPaid(id) {
+        const debt = debts.find(d => d.id === id);
+        if (!debt) return;
+        const member = members.find(m => m.id === debt.memberId);
+        if (!member) {
+            alert("Member associated with this debt not found.");
+            return;
+        }
+
+        showSpinner("Processing payment...");
+        const memberName = `${member.firstName} ${member.lastName}`;
+        const newTransactionData = {
+            id: transactions.length > 0 ? Math.max(...transactions.map(t => t.id)) + 1 : 1,
+            date: new Date().toISOString(),
+            description: `Debt Payment: ${memberName} (${debt.description})`,
+            type: 'income',
+            amount: debt.amount,
+            memberId: debt.memberId
+        };
+
+        const [debtResult, transactionResult] = await Promise.all([
+            apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.debts}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: { isPaid: 'TRUE' } })
+            }),
+            apiCall(`${API_URL}?sheet=${SHEETS.transactions}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: [newTransactionData] })
+            })
+        ]);
+
+        hideSpinner();
+
+        if (debtResult && transactionResult) {
+            debt.isPaid = true;
+            transactions.push(parseTransactions([newTransactionData])[0]);
+            alert(translations.alertDebtPaid[currentLanguage]);
+            refreshAllDynamicContent();
+        } else {
+            alert("An error occurred while processing the payment.");
+        }
+    }
+    
     function loadSubscriptionsPage() {
         const tbody = document.getElementById("subscription-types-table").querySelector("tbody");
         tbody.innerHTML = "";
@@ -1075,7 +1494,7 @@
             form.querySelector('#sub-type-id').value = '';
         }
         const modalEl = document.getElementById('subscriptionTypeModal');
-        bootstrap.Modal.getOrCreateInstance(modalEl).show(); // CORRECTED LINE
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
     
     async function saveSubscriptionType() {
@@ -1156,85 +1575,83 @@
     function renderSubscriptionsReportTable(){const t=document.getElementById("subscriptions-report-table").querySelector("tbody");t.innerHTML="";const e=members.filter(t=>t.subscriptionActive);if(0===e.length)return void(t.innerHTML=`<tr><td colspan="5" class="text-center py-4" data-translate="noSubData">${translations.noSubData[currentLanguage]}</td></tr>`);const o=new Date;o.setHours(0,0,0,0),e.forEach(m=>{let r,n;const d=m.subscriptionEndDate,i=Math.ceil((d-o)/864e5);i<0?(r="Expired",n="danger"):i<=EXPIRATION_REMINDER_DAYS?(r="Expiring",n="warning"):(r="Active",n="success");const l=t.insertRow();l.innerHTML=`<td>${m.firstName} ${m.lastName}</td><td class="text-capitalize">${m.subscriptionType}</td><td>${m.subscriptionStartDate.toLocaleDateString()}</td><td>${d.toLocaleDateString()}</td><td><span class="badge bg-${n}">${r}</span></td>`})}
     function loadMessagingPage(){const t=document.getElementById("individual-member");t.innerHTML=`<option value="" disabled selected>${translations.selectPlaceholder[currentLanguage]}</option>`,members.sort((t,e)=>t.firstName.localeCompare(e.firstName)).forEach(e=>t.innerHTML+=`<option value="${e.id}">${e.firstName} ${e.lastName}</option>`),renderMessageHistory()}
     function renderMessageHistory(){const t=document.getElementById("message-history-table").querySelector("tbody");t.innerHTML="";if(0===messageHistory.length)return void(t.innerHTML=`<tr><td colspan="4" class="text-center py-4" data-translate="noMessages">${translations.noMessages[currentLanguage]}</td></tr>`);messageHistory.sort((t,e)=>e.sentAt-t.sentAt).forEach(e=>{const o=t.insertRow();o.innerHTML=`<td>${e.sentAt.toLocaleDateString()}</td><td>${e.recipients}</td><td class="text-truncate" style="max-width: 250px;">${e.message}</td><td><span class="badge bg-success">${e.status}</span></td>`})}
-   // REPLACE the old sendMessage function with this new one
-async function sendMessage() {
-    const recipientGroup = document.getElementById('message-recipients').value;
-    const messageContent = document.getElementById('message-content').value.trim();
-    let recipientText = document.querySelector(`#message-recipients option[value="${recipientGroup}"]`).textContent;
-    
-    if (!messageContent) {
-        return alert(translations.alertEmptyMessage[currentLanguage]);
+   
+    async function sendMessage() {
+        const recipientGroup = document.getElementById('message-recipients').value;
+        const messageContent = document.getElementById('message-content').value.trim();
+        let recipientText = document.querySelector(`#message-recipients option[value="${recipientGroup}"]`).textContent;
+        
+        if (!messageContent) {
+            return alert(translations.alertEmptyMessage[currentLanguage]);
+        }
+
+        let targetMembers = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const eDate = new Date();
+        eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
+
+        switch (recipientGroup) {
+            case 'all': targetMembers = [...members]; break;
+            case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
+            case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
+            case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
+            case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
+            case 'individual':
+                const memberId = document.getElementById('individual-member').value;
+                if (!memberId) return alert(translations.alertSelectIndividual[currentLanguage]);
+                const member = members.find(m => m.id == memberId);
+                if (member) {
+                    targetMembers.push(member);
+                    recipientText = `${member.firstName} ${member.lastName}`;
+                }
+                break;
+        }
+
+        if (targetMembers.length === 0) {
+            return alert(translations.alertNoValidPhones[currentLanguage]); 
+        }
+        
+        showSpinner(`Sending message to ${targetMembers.length} member(s)...`);
+
+        const messagesToSend = targetMembers.map(member => {
+            return {
+                messageId: Date.now() + Math.random(), 
+                memberId: member.id,
+                senderName: "Vorta Fitness Admin",
+                messageContent: messageContent,
+                sentAt: new Date().toISOString(),
+                status: 'delivered'
+            };
+        });
+
+        const inboxPayload = { data: messagesToSend };
+
+        const result = await apiCall(`${API_URL}?sheet=${SHEETS.inbox}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(inboxPayload)
+        });
+
+        const logMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
+        await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
+             method: 'POST',
+             headers: {'Content-Type': 'application/json'},
+             body: JSON.stringify({data: [logMessage]})
+        });
+        
+        hideSpinner();
+
+        if (result && result.created > 0) { 
+            messageHistory.push(parseMessageHistory([logMessage])[0]); 
+            alert(`Message successfully delivered to ${result.created} member(s).`); 
+            document.getElementById('message-form').reset(); 
+            document.getElementById('individual-select-container').classList.add('d-none'); 
+            renderMessageHistory(); 
+        } else { 
+            alert("Failed to send message. Check API logs."); 
+        } 
     }
-
-    let targetMembers = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const eDate = new Date();
-    eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
-
-    switch (recipientGroup) {
-        case 'all': targetMembers = [...members]; break;
-        case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
-        case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
-        case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
-        case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
-        case 'individual':
-            const memberId = document.getElementById('individual-member').value;
-            if (!memberId) return alert(translations.alertSelectIndividual[currentLanguage]);
-            const member = members.find(m => m.id == memberId);
-            if (member) {
-                targetMembers.push(member);
-                recipientText = `${member.firstName} ${member.lastName}`;
-            }
-            break;
-    }
-
-    if (targetMembers.length === 0) {
-        return alert(translations.alertNoValidPhones[currentLanguage]); // Re-using this alert, as it implies no members were found
-    }
-    
-    showSpinner(`Sending message to ${targetMembers.length} member(s)...`);
-
-    const messagesToSend = targetMembers.map(member => {
-        return {
-            messageId: Date.now() + Math.random(), // Add random to ensure uniqueness for batch sends
-            memberId: member.id,
-            senderName: "Vorta Fitness Admin",
-            messageContent: messageContent,
-            sentAt: new Date().toISOString(),
-            status: 'delivered'
-        };
-    });
-
-    const inboxPayload = { data: messagesToSend };
-
-    // Send to member inboxes
-    const result = await apiCall(`${API_URL}?sheet=${SHEETS.inbox}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(inboxPayload)
-    });
-
-    // Optional: Log the action in MessageHistory
-    const logMessage = { sentAt: new Date().toISOString(), recipients: recipientText, message: messageContent, status: "Sent" };
-    await apiCall(`${API_URL}?sheet=${SHEETS.msgHistory}`, {
-         method: 'POST',
-         headers: {'Content-Type': 'application/json'},
-         body: JSON.stringify({data: [logMessage]})
-    });
-    
-    hideSpinner();
-
-    if (result && result.created > 0) { 
-        messageHistory.push(parseMessageHistory([logMessage])[0]); 
-        alert(`Message successfully delivered to ${result.created} member(s).`); 
-        document.getElementById('message-form').reset(); 
-        document.getElementById('individual-select-container').classList.add('d-none'); 
-        renderMessageHistory(); 
-    } else { 
-        alert("Failed to send message. Check API logs."); 
-    } 
-}
 
     async function handleChangePassword() { 
         const form = document.getElementById('change-password-form'); 
@@ -1261,6 +1678,50 @@ async function sendMessage() {
             form.reset();
         }
     }
+
+    function loadSettingsPage() {
+        const toggle = document.getElementById('show-summary-toggle');
+        const show = localStorage.getItem('vortaFitnessShowSummaryOnDashboard') === 'true';
+        toggle.checked = show;
+    }
+
+    function positionFinancialSummary() {
+        const showOnDashboard = localStorage.getItem('vortaFitnessShowSummaryOnDashboard') === 'true';
+        
+        const summaryBlock = document.getElementById('financial-summary-block');
+        const dashboardPlaceholder = document.getElementById('dashboard-summary-placeholder');
+        const financialsTab = document.getElementById('financials-tab');
+
+        if (!summaryBlock || !dashboardPlaceholder || !financialsTab) {
+            console.error("One or more summary layout elements are missing.");
+            return;
+        }
+
+        if (showOnDashboard) {
+            dashboardPlaceholder.appendChild(summaryBlock);
+        } else {
+            financialsTab.prepend(summaryBlock);
+        }
+    }
+
+    function handleToggleSummary(event) {
+        const toggle = event.target;
+        const wantsToShow = toggle.checked;
+        event.preventDefault();
+
+        const enteredPassword = prompt(translations.requiresFinancialsPassword[currentLanguage]);
+        const correctPassword = getFinancialsPassword();
+
+        if (enteredPassword === correctPassword) {
+            localStorage.setItem('vortaFitnessShowSummaryOnDashboard', wantsToShow);
+            toggle.checked = wantsToShow;
+            positionFinancialSummary();
+            alert('تم تحديث الإعداد بنجاح.');
+        } else if (enteredPassword !== null) {
+            alert(translations.alertIncorrectPassword[currentLanguage]);
+        }
+    }
+
 </script>
 </body>
 </html>

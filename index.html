@@ -214,6 +214,7 @@
                 <a href="#" class="list-group-item list-group-item-action" data-tab="members"><i class="fas fa-users fa-fw me-3"></i><span data-translate="members">Members</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="financials"><i class="fas fa-wallet fa-fw me-3"></i><span data-translate="financials">Financials</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="debts"><i class="fas fa-file-invoice-dollar fa-fw me-3"></i><span data-translate="debts">Debts</span></a>
+                <a href="#" class="list-group-item list-group-item-action" data-tab="frozen"><i class="fas fa-snowflake fa-fw me-3"></i><span data-translate="frozenSubscriptions">Frozen Subscriptions</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="subscriptions"><i class="fas fa-tags fa-fw me-3"></i><span data-translate="subscriptions">Subscriptions</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="messaging"><i class="fas fa-comments fa-fw me-3"></i><span data-translate="messaging">Messaging</span></a>
                 <a href="#" class="list-group-item list-group-item-action" data-tab="reports"><i class="fas fa-chart-line fa-fw me-3"></i><span data-translate="reports">Reports</span></a>
@@ -255,6 +256,26 @@
                             <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--success-color);"><i class="fas fa-arrow-up"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalIncome">Total Income</h6><p class="card-value" id="total-income">₪0</p></div></div></div>
                             <div class="col-xl-4 col-md-6"><div class="stat-card"><div class="card-icon" style="background-color: var(--danger-color);"><i class="fas fa-arrow-down"></i></div><div class="card-details"><h6 class="card-title" data-translate="totalExpenses">Total Expenses</h6><p class="card-value" id="total-expenses">₪0</p></div></div></div>
                             <div class="col-xl-4 col-md-12"><div class="stat-card"><div class="card-icon" style="background-color: var(--primary-color);"><i class="fas fa-balance-scale"></i></div><div class="card-details"><h6 class="card-title" data-translate="netProfit">Net Profit</h6><p class="card-value" id="net-profit">₪0</p></div></div></div>
+                        </div>
+                        <div class="row g-4 mb-4">
+                            <div class="col-xl-6 col-md-6">
+                                <div class="stat-card">
+                                    <div class="card-icon" style="background-color: #ffc107;"><i class="fas fa-file-invoice-dollar"></i></div>
+                                    <div class="card-details">
+                                        <h6 class="card-title" data-translate="totalUnpaidDebts">Unpaid Debts</h6>
+                                        <p class="card-value" id="total-unpaid-debts">₪0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-md-6">
+                                <div class="stat-card">
+                                    <div class="card-icon" style="background-color: #6c757d;"><i class="fas fa-exclamation-circle"></i></div>
+                                    <div class="card-details">
+                                        <h6 class="card-title" data-translate="totalLiabilities">Total Liabilities</h6>
+                                        <p class="card-value" id="total-liabilities">₪0</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -305,6 +326,30 @@
                                     <tbody></tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FROZEN SUBSCRIPTIONS TAB -->
+                <div id="frozen-tab" class="content-tab d-none">
+                    <h2 class="mb-4" data-translate="frozenSubscriptions">Frozen Subscriptions</h2>
+                    <div class="card bg-surface">
+                        <div class="card-body">
+                           <div class="table-responsive">
+                               <table class="table table-hover" id="frozen-table">
+                                   <thead>
+                                       <tr>
+                                           <th data-translate="memberId">ID</th>
+                                           <th data-translate="fullName">Full Name</th>
+                                           <th data-translate="subscription">Subscription</th>
+                                           <th data-translate="status">Status</th>
+                                           <th data-translate="actions">Actions</th>
+                                       </tr>
+                                    </thead>
+                                   <tbody>
+                                   </tbody>
+                               </table>
+                           </div>
                         </div>
                     </div>
                 </div>
@@ -406,6 +451,10 @@
                     <form id="debt-form">
                         <input type="hidden" id="debt-id">
                         <div class="mb-3">
+                            <label for="debt-member-search" class="form-label" data-translate="search">Search</label>
+                            <input type="search" class="form-control" id="debt-member-search" data-translate="search" placeholder="Search...">
+                        </div>
+                        <div class="mb-3">
                             <label for="debt-member" class="form-label" data-translate="member">Member</label>
                             <select id="debt-member" class="form-select" required></select>
                         </div>
@@ -440,7 +489,7 @@
     <script>
     // =================================================================================
     // Vorta Fitness - Club Management System
-    // Version: 9.7 (Settings Password Protection)
+    // Version: 10.0 (Bug Fixes & Freeze Logic Enhancement)
     // =================================================================================
     'use strict';
     
@@ -452,19 +501,29 @@
         msgHistory: 'MessageHistory',
         passwords: 'Passwords',
         inbox: 'InboxMessages',
-        debts: 'Debts' // New sheet for debts
+        debts: 'Debts'
     };
 
     const EXPIRATION_REMINDER_DAYS = 10;
     
     let currentTab = 'dashboard', currentLanguage = localStorage.getItem('vortaFitnessLanguage') || 'english';
-    let members = [], messageHistory = [], subscriptionTypes = [], transactions = [], passwords = [], debts = []; // New array for debts
+    let members = [], messageHistory = [], subscriptionTypes = [], transactions = [], passwords = [], debts = [];
     let genderChart, subscriptionChart, memberGrowthChart = null;
     let dashboardFilter = null; 
 
     const translations = {
         dashboard: { english: 'Dashboard', arabic: 'لوحة التحكم' }, members: { english: 'Members', arabic: 'الأعضاء' }, financials: { english: 'Financials', arabic: 'المالية' }, subscriptions: { english: 'Subscriptions', arabic: 'الاشتراكات' }, messaging: { english: 'Messaging', arabic: 'الرسائل' }, reports: { english: 'Reports', arabic: 'التقارير' }, settings: { english: 'Settings', arabic: 'الإعدادات' },
         debts: { english: 'Debts', arabic: 'الديون' },
+        frozenSubscriptions: { english: 'Frozen Subs', arabic: 'الاشتراكات المجمدة' },
+        freeze: { english: 'Freeze', arabic: 'تجميد' },
+        unfreeze: { english: 'Unfreeze', arabic: 'إلغاء التجميد' },
+        statusFrozen: { english: 'Frozen ({days} days saved)', arabic: 'مجمد ({days} يوم محفوظ)' },
+        noFrozenMembers: { english: 'No frozen subscriptions found.', arabic: 'لا توجد اشتراكات مجمدة.' },
+        alertConfirmFreeze: { english: 'Are you sure you want to freeze this subscription?', arabic: 'هل أنت متأكد من تجميد هذا الاشتراك؟' },
+        alertConfirmUnfreeze: { english: 'Are you sure you want to unfreeze this subscription?', arabic: 'هل أنت متأكد من إلغاء تجميد هذا الاشتراك؟' },
+        alertSubFrozen: { english: 'Subscription has been frozen successfully.', arabic: 'تم تجميد الاشتراك بنجاح.' },
+        alertSubUnfrozen: { english: 'Subscription has been unfrozen successfully.', arabic: 'تم إلغاء تجميد الاشتراك بنجاح.' },
+        alertCantFreeze: { english: 'Cannot freeze an expired or already frozen subscription.', arabic: 'لا يمكن تجميد اشتراك منتهي الصلاحية أو مجمد بالفعل.' },
         debtManagement: { english: 'Debt Management', arabic: 'إدارة الديون' },
         addDebt: { english: 'Add Debt', arabic: 'إضافة دين' },
         editDebt: { english: 'Edit Debt', arabic: 'تعديل دين' },
@@ -482,6 +541,8 @@
         status_expired_with_days: { english: 'Expired ({days} days ago)', arabic: 'منتهي (قبل {days} يوم)' },
         status_none: { english: 'None', arabic: 'لا يوجد' },
         financialSummary: { english: 'Financial Summary', arabic: 'الملخص المالي' }, totalIncome: { english: 'Total Income', arabic: 'إجمالي الإيرادات' }, totalExpenses: { english: 'Total Expenses', arabic: 'إجمالي المصروفات' }, netProfit: { english: 'Net Profit', arabic: 'صافي الربح' },
+        totalUnpaidDebts: { english: 'Unpaid Debts', arabic: 'الديون الغير مدفوعة' },
+        totalLiabilities: { english: 'Total Liabilities (Expenses + Debts)', arabic: 'إجمالي الالتزامات' },
         memberId: { english: 'ID', arabic: 'الرقم' }, fullName: { english: 'Full Name', arabic: 'الاسم الكامل' }, gender: { english: 'Gender', arabic: 'الجنس' }, contact: { english: 'Contact', arabic: 'التواصل' }, subscription: { english: 'Subscription', arabic: 'الاشتراك' }, status: { english: 'Status', arabic: 'الحالة' }, actions: { english: 'Actions', arabic: 'الإجراءات' },
         addMember: { english: 'Add Member', arabic: 'إضافة عضو' }, search: { english: 'Search...', arabic: 'بحث...' }, all: { english: 'All', arabic: 'الكل' }, male: { english: 'Male', arabic: 'ذكور' }, female: { english: 'Female', arabic: 'إناث' },
         save: { english: 'Save', arabic: 'حفظ' }, saveData: { english: 'Save Data', arabic: 'حفظ البيانات' }, saveChanges: { english: 'Save Changes', arabic: 'حفظ التغييرات' }, cancel: { english: 'Cancel', arabic: 'إلغاء' }, close: { english: 'Close', arabic: 'إغلاق' }, view: { english: 'View', arabic: 'عرض' }, edit: { english: 'Edit', arabic: 'تعديل' }, delete: { english: 'Delete', arabic: 'حذف' }, renewSub: { english: 'Renew Sub', arabic: 'تجديد اشتراك' },
@@ -653,7 +714,9 @@
             subscriptionStartDate: m.subscriptionStartDate ? new Date(m.subscriptionStartDate) : null,
             subscriptionEndDate: m.subscriptionEndDate ? new Date(m.subscriptionEndDate) : null,
             subscriptionActive: m.subscriptionActive === 'TRUE',
-            createdAt: m.createdAt ? new Date(m.createdAt) : new Date()
+            createdAt: m.createdAt ? new Date(m.createdAt) : new Date(),
+            isFrozen: m.isFrozen === 'TRUE',
+            daysRemainingOnFreeze: m.daysRemainingOnFreeze ? parseInt(m.daysRemainingOnFreeze, 10) : null
         }));
     }
 
@@ -754,10 +817,8 @@
     }
 
     async function showTab(tabName) {
-        // START OF MODIFICATION: Added 'settings' to the protected tabs
         const protectedTabs = ['financials', 'debts', 'settings'];
         if (protectedTabs.includes(tabName)) {
-        // END OF MODIFICATION
             const enteredPassword = prompt(translations.requiresFinancialsPassword[currentLanguage]);
             const correctPassword = getFinancialsPassword();
 
@@ -771,7 +832,7 @@
         document.querySelectorAll('.content-tab').forEach(tab => tab.classList.add('d-none'));
         document.getElementById(tabName + '-tab').classList.remove('d-none');
         document.querySelectorAll('.main-sidebar [data-tab]').forEach(link => link.classList.toggle('active', link.dataset.tab === tabName));
-        const tabActions = { dashboard: refreshDashboard, members: loadMembers, financials: loadFinancialsPage, debts: loadDebtsPage, subscriptions: loadSubscriptionsPage, messaging: loadMessagingPage, reports: loadReportsPage, settings: loadSettingsPage };
+        const tabActions = { dashboard: refreshDashboard, members: loadMembers, financials: loadFinancialsPage, debts: loadDebtsPage, frozen: loadFrozenPage, subscriptions: loadSubscriptionsPage, messaging: loadMessagingPage, reports: loadReportsPage, settings: loadSettingsPage };
         tabActions[tabName]?.();
     }
 
@@ -794,25 +855,31 @@
         const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
         const netProfit = totalIncome - totalExpenses;
         
+        const totalUnpaidDebts = debts.filter(d => !d.isPaid).reduce((sum, d) => sum + d.amount, 0);
+        const totalLiabilities = totalExpenses + totalUnpaidDebts;
+
         document.getElementById("total-income").textContent = formatCurrency(totalIncome);
         document.getElementById("total-expenses").textContent = formatCurrency(totalExpenses);
         document.getElementById("net-profit").textContent = formatCurrency(netProfit);
+        document.getElementById("total-unpaid-debts").textContent = formatCurrency(totalUnpaidDebts);
+        document.getElementById("total-liabilities").textContent = formatCurrency(totalLiabilities);
     }
 
+    // START OF CHANGE: Updated dashboard logic to exclude frozen members
     function refreshDashboard() { 
         const today = new Date(); 
         today.setHours(0,0,0,0);
         
-        const allActiveMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate);
-        const activeNow = allActiveMembers.filter(m => m.subscriptionEndDate >= today);
-
+        const nonFrozenMembers = members.filter(m => !m.isFrozen);
+        const allActiveMembers = nonFrozenMembers.filter(m => m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today);
+        
         const total = members.length;
-        const active = activeNow.length;
-        const unsubscribed = total - active;
+        const active = allActiveMembers.length;
+        const unsubscribed = total - active - members.filter(m => m.isFrozen).length;
         
         const eDate = new Date(); 
         eDate.setDate(today.getDate() + EXPIRATION_REMINDER_DAYS);
-        const expiring = activeNow.filter(m => m.subscriptionEndDate <= eDate).length;
+        const expiring = allActiveMembers.filter(m => m.subscriptionEndDate <= eDate).length;
         
         document.getElementById("total-members").textContent = total;
         document.getElementById("active-subscriptions").textContent = active;
@@ -822,6 +889,7 @@
         updateFinancialSummaryCards(); 
         renderDashboardCharts();
     }
+    // END OF CHANGE
     
     function renderDashboardCharts(){
         if(typeof Chart === "undefined") return;
@@ -832,7 +900,7 @@
         genderChart=new Chart(g,{type:"doughnut",data:{labels:["Male","Female"],datasets:[{data:[m,f],backgroundColor:["#0d6efd","#dc3545"],borderWidth:0}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{position:"top",labels:{color:"#f8f9fa"}}}}});
         
         const subTypeCounts = members.reduce((acc, member) => {
-            if (member.subscriptionActive) {
+            if (member.subscriptionActive && !member.isFrozen) {
                 const subTypeName = member.subscriptionType || "Unknown";
                 acc[subTypeName] = (acc[subTypeName] || 0) + 1;
             }
@@ -843,6 +911,7 @@
         subscriptionChart=new Chart(c,{type:"bar",data:{labels: Object.keys(subTypeCounts), datasets:[{data: Object.values(subTypeCounts), backgroundColor:["#198754","#ffc107","#0dcaf0","#6f42c1", "#e83e8c"]}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{beginAtZero:!0,grid:{color:"#3b3e47"},ticks:{color:"#f8f9fa",stepSize:1}},x:{grid:{display:!1},ticks:{color:"#f8f9fa"}}}}});
     }
     
+    // START OF CHANGE: Updated member loading logic to handle dashboard filters correctly
     function loadMembers() {
         let filteredMembers = [...members]; 
 
@@ -854,13 +923,13 @@
 
             switch (dashboardFilter) {
                 case 'active':
-                    filteredMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today);
+                    filteredMembers = members.filter(m => !m.isFrozen && m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today);
                     break;
                 case 'expiring':
-                    filteredMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate);
+                    filteredMembers = members.filter(m => !m.isFrozen && m.subscriptionActive && m.subscriptionEndDate && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate);
                     break;
                 case 'unsubscribed':
-                    filteredMembers = members.filter(m => !m.subscriptionActive || (m.subscriptionEndDate && m.subscriptionEndDate < today));
+                    filteredMembers = members.filter(m => !m.isFrozen && (!m.subscriptionActive || (m.subscriptionEndDate && m.subscriptionEndDate < today)));
                     break;
             }
             dashboardFilter = null;
@@ -874,6 +943,7 @@
         
         renderMembersTable(filteredMembers);
     }
+    // END OF CHANGE
     
     function filterMembersByGender(gender){document.querySelectorAll("#members-tab .btn-group button").forEach(e=>e.classList.toggle("active",e.dataset.gender===gender));loadMembers()}
     function filterMembersTable(){loadMembers()}
@@ -887,27 +957,34 @@
         }
         const today = new Date(); today.setHours(0,0,0,0);
         data.forEach(member => {
-            let status, statusClass;
-            if(member.subscriptionActive && member.subscriptionEndDate) {
+            let status, statusClass, freezeAction = '';
+            
+            if (member.isFrozen) {
+                status = translations.statusFrozen[currentLanguage].replace('{days}', member.daysRemainingOnFreeze || 'N/A');
+                statusClass = "info";
+            } else if (member.subscriptionActive && member.subscriptionEndDate) {
                 const endDate = member.subscriptionEndDate;
                 const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
                 if(daysLeft < 0) {
-                    const daysAgo = Math.abs(daysLeft);
-                    status = translations.status_expired_with_days[currentLanguage].replace('{days}', daysAgo);
+                    status = translations.status_expired_with_days[currentLanguage].replace('{days}', Math.abs(daysLeft));
                     statusClass = "danger";
-                } else if (daysLeft <= EXPIRATION_REMINDER_DAYS) {
-                    status = translations.status_expiring_with_days[currentLanguage].replace('{days}', daysLeft);
-                    statusClass = "warning";
                 } else {
-                    status = translations.status_active_with_days[currentLanguage].replace('{days}', daysLeft);
-                    statusClass = "success";
+                    if (daysLeft <= EXPIRATION_REMINDER_DAYS) {
+                        status = translations.status_expiring_with_days[currentLanguage].replace('{days}', daysLeft);
+                        statusClass = "warning";
+                    } else {
+                        status = translations.status_active_with_days[currentLanguage].replace('{days}', daysLeft);
+                        statusClass = "success";
+                    }
+                    freezeAction = `<li><a class="dropdown-item" href="#" onclick="freezeSubscription(${member.id})"><i class="fas fa-snowflake fa-fw me-2"></i><span data-translate="freeze">${translations.freeze[currentLanguage]}</span></a></li>`;
                 }
             } else {
                 status = translations.status_none[currentLanguage]; 
                 statusClass = "secondary";
             }
+
             const row = tbody.insertRow();
-            row.innerHTML=`<td>${member.id}</td><td>${member.firstName} ${member.lastName}</td><td><i class="fas fa-${member.gender==="male"?"male text-primary":"female text-danger"} me-2"></i> ${member.gender}</td><td><div>${member.phone}</div><div class="small text-muted">${member.email||""}</div></td><td class="text-capitalize">${member.subscriptionType||"N/A"}</td><td><span class="badge bg-${statusClass}">${status}</span></td><td><div class="dropdown"><button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-translate="actions">${translations.actions[currentLanguage]}</button><ul class="dropdown-menu dropdown-menu-dark"><li><a class="dropdown-item" href="#" onclick="viewMember(${member.id})"><i class="fas fa-eye fa-fw me-2"></i><span data-translate="view">${translations.view[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="editMember(${member.id})"><i class="fas fa-edit fa-fw me-2"></i><span data-translate="edit">${translations.edit[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="addSubscriptionForMember(${member.id})"><i class="fas fa-sync fa-fw me-2"></i><span data-translate="renewSub">${translations.renewSub[currentLanguage]}</span></a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="#" onclick="deleteMember(${member.id})"><i class="fas fa-trash fa-fw me-2"></i><span data-translate="delete">${translations.delete[currentLanguage]}</span></a></li></ul></div></td>`;
+            row.innerHTML=`<td>${member.id}</td><td>${member.firstName} ${member.lastName}</td><td><i class="fas fa-${member.gender==="male"?"male text-primary":"female text-danger"} me-2"></i> ${member.gender}</td><td><div>${member.phone}</div><div class="small text-muted">${member.email||""}</div></td><td class="text-capitalize">${member.subscriptionType||"N/A"}</td><td><span class="badge bg-${statusClass}">${status}</span></td><td><div class="dropdown"><button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-translate="actions">${translations.actions[currentLanguage]}</button><ul class="dropdown-menu dropdown-menu-dark"><li><a class="dropdown-item" href="#" onclick="viewMember(${member.id})"><i class="fas fa-eye fa-fw me-2"></i><span data-translate="view">${translations.view[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="editMember(${member.id})"><i class="fas fa-edit fa-fw me-2"></i><span data-translate="edit">${translations.edit[currentLanguage]}</span></a></li><li><a class="dropdown-item" href="#" onclick="addSubscriptionForMember(${member.id})"><i class="fas fa-sync fa-fw me-2"></i><span data-translate="renewSub">${translations.renewSub[currentLanguage]}</span></a></li>${freezeAction}<li><hr class="dropdown-divider"></li><li><a class="dropdown-item text-danger" href="#" onclick="deleteMember(${member.id})"><i class="fas fa-trash fa-fw me-2"></i><span data-translate="delete">${translations.delete[currentLanguage]}</span></a></li></ul></div></td>`;
         });
     }
     
@@ -949,7 +1026,8 @@
                 subscriptionPrice: subType.price,
                 subscriptionStartDate: startDate.toISOString(),
                 subscriptionEndDate: endDate.toISOString(),
-                subscriptionActive: 'TRUE'
+                subscriptionActive: 'TRUE',
+                isFrozen: 'FALSE' 
             };
 
             const newTransactionData = {
@@ -997,7 +1075,8 @@
                 gender: form.querySelector("#add-gender").value,
                 email: form.querySelector("#add-email").value.trim(),
                 language: form.querySelector("#add-language").value,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isFrozen: 'FALSE'
             };
             let newTransactionData = null;
 
@@ -1166,7 +1245,8 @@
             subscriptionPrice: subType.price,
             subscriptionStartDate: startDate.toISOString(),
             subscriptionEndDate: endDate.toISOString(),
-            subscriptionActive: 'TRUE'
+            subscriptionActive: 'TRUE',
+            isFrozen: 'FALSE'
         };
 
         const newTransactionData = {
@@ -1203,6 +1283,111 @@
             refreshAllDynamicContent();
         }
     }
+
+    function loadFrozenPage() {
+        const frozenMembers = members.filter(m => m.isFrozen === true);
+        const tbody = document.getElementById("frozen-table").querySelector("tbody");
+        tbody.innerHTML = "";
+
+        if (frozenMembers.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4" data-translate="noFrozenMembers">${translations.noFrozenMembers[currentLanguage]}</td></tr>`;
+            return;
+        }
+
+        frozenMembers.forEach(member => {
+            const status = translations.statusFrozen[currentLanguage].replace('{days}', member.daysRemainingOnFreeze || 'N/A');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${member.id}</td>
+                <td>${member.firstName} ${member.lastName}</td>
+                <td class="text-capitalize">${member.subscriptionType || "N/A"}</td>
+                <td><span class="badge bg-info">${status}</span></td>
+                <td><button class="btn btn-sm btn-outline-success" onclick="unfreezeSubscription(${member.id})"><i class="fas fa-play-circle me-2"></i><span data-translate="unfreeze">${translations.unfreeze[currentLanguage]}</span></button></td>
+            `;
+        });
+    }
+
+    // START OF CHANGE: Corrected Freeze/Unfreeze logic
+    async function freezeSubscription(id) {
+        const member = members.find(m => m.id === id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (!member || member.isFrozen || !member.subscriptionActive || member.subscriptionEndDate < today) {
+            alert(translations.alertCantFreeze[currentLanguage]);
+            return;
+        }
+
+        if (confirm(translations.alertConfirmFreeze[currentLanguage])) {
+            const daysRemaining = Math.round((member.subscriptionEndDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysRemaining <= 0) {
+                alert(translations.alertCantFreeze[currentLanguage]);
+                return;
+            }
+
+            const updateData = {
+                isFrozen: 'TRUE',
+                daysRemainingOnFreeze: daysRemaining
+            };
+            
+            showSpinner("Freezing...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.members}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: updateData })
+            });
+            hideSpinner();
+
+            if (result && result.updated > 0) {
+                member.isFrozen = true;
+                member.daysRemainingOnFreeze = daysRemaining;
+                alert(translations.alertSubFrozen[currentLanguage]);
+                refreshAllDynamicContent();
+            } else {
+                 console.error("Failed to update sheet for freeze:", result);
+                 alert("Failed to save freeze status. Please check console.");
+            }
+        }
+    }
+
+    async function unfreezeSubscription(id) {
+        const member = members.find(m => m.id === id);
+        if (!member || !member.isFrozen) return;
+
+        if (confirm(translations.alertConfirmUnfreeze[currentLanguage])) {
+            const daysToRestore = member.daysRemainingOnFreeze || 0;
+            const today = new Date();
+            const newEndDate = new Date(today);
+            newEndDate.setDate(today.getDate() + daysToRestore);
+
+            const updateData = {
+                isFrozen: 'FALSE',
+                subscriptionEndDate: newEndDate.toISOString(),
+                daysRemainingOnFreeze: '' 
+            };
+
+            showSpinner("Unfreezing...");
+            const result = await apiCall(`${API_URL}/id/${id}?sheet=${SHEETS.members}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: updateData })
+            });
+            hideSpinner();
+
+            if (result && result.updated > 0) {
+                member.isFrozen = false;
+                member.subscriptionEndDate = newEndDate;
+                member.daysRemainingOnFreeze = null;
+                alert(translations.alertSubUnfrozen[currentLanguage]);
+                refreshAllDynamicContent();
+            } else {
+                console.error("Failed to update sheet for unfreeze:", result);
+                alert("Failed to save unfreeze status. Please check console.");
+            }
+        }
+    }
+    // END OF CHANGE
 
     function loadFinancialsPage() {
         updateFinancialSummaryCards(); 
@@ -1336,12 +1521,30 @@
         const form = document.getElementById('debt-form');
         form.reset();
         const modalLabel = document.getElementById('debtModalLabel');
+        const searchInput = document.getElementById('debt-member-search');
         const memberSelect = document.getElementById('debt-member');
 
-        memberSelect.innerHTML = `<option value="" disabled selected>-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
-        members.sort((a,b) => a.firstName.localeCompare(b.firstName)).forEach(m => {
-            memberSelect.innerHTML += `<option value="${m.id}">${m.firstName} ${m.lastName}</option>`;
-        });
+        const sortedMembers = [...members].sort((a, b) => a.firstName.localeCompare(b.firstName));
+
+        const populateSelect = (memberList) => {
+            const currentValue = memberSelect.value;
+            memberSelect.innerHTML = `<option value="" disabled selected>-- ${translations.selectPlaceholder[currentLanguage]} --</option>`;
+            memberList.forEach(m => {
+                memberSelect.innerHTML += `<option value="${m.id}">${m.firstName} ${m.lastName}</option>`;
+            });
+            if (memberList.some(m => m.id == currentValue)) {
+                memberSelect.value = currentValue;
+            }
+        };
+        populateSelect(sortedMembers);
+
+        searchInput.oninput = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredMembers = sortedMembers.filter(m =>
+                `${m.firstName} ${m.lastName}`.toLowerCase().includes(searchTerm)
+            );
+            populateSelect(filteredMembers);
+        };
 
         if (id) {
             const debt = debts.find(d => d.id === id);
@@ -1349,16 +1552,18 @@
                 modalLabel.textContent = translations.editDebt[currentLanguage];
                 form.querySelector('#debt-id').value = debt.id;
                 memberSelect.value = debt.memberId;
-                memberSelect.disabled = true;
                 form.querySelector('#debt-description').value = debt.description;
                 form.querySelector('#debt-amount').value = debt.amount;
                 form.querySelector('#debt-date').valueAsDate = new Date(debt.date);
+                memberSelect.disabled = true;
+                searchInput.disabled = true;
             }
         } else {
             modalLabel.textContent = translations.addDebt[currentLanguage];
             form.querySelector('#debt-id').value = '';
-            memberSelect.disabled = false;
             form.querySelector('#debt-date').valueAsDate = new Date();
+            memberSelect.disabled = false;
+            searchInput.disabled = false;
         }
     }
 
@@ -1593,8 +1798,8 @@
 
         switch (recipientGroup) {
             case 'all': targetMembers = [...members]; break;
-            case 'active': targetMembers = members.filter(m => m.subscriptionActive); break;
-            case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
+            case 'active': targetMembers = members.filter(m => m.subscriptionActive && !m.isFrozen); break;
+            case 'expiring': targetMembers = members.filter(m => m.subscriptionActive && !m.isFrozen && m.subscriptionEndDate >= today && m.subscriptionEndDate <= eDate); break;
             case 'male': targetMembers = members.filter(m => m.gender === 'male'); break;
             case 'female': targetMembers = members.filter(m => m.gender === 'female'); break;
             case 'individual':
